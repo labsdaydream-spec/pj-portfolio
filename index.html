@@ -654,8 +654,7 @@
       ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale);
     }
 
-    // jsDelivr CDN — serves GitHub files globally with zero access restrictions
-    const FRAME_BASE = 'https://cdn.jsdelivr.net/gh/labsdaydream-spec/pj-portfolio@gh-pages/frames/';
+    const FRAME_BASE = './frames/';
 
     function finishLoading() {
       if (allLoaded) return;
