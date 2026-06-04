@@ -623,6 +623,14 @@
     const ctaBtn        = document.getElementById('cta-btn');
     const scrollDriver  = document.getElementById('scroll-driver');
 
+    // ── STATE — must be declared before resizeCanvas is called ──────────
+    const images   = new Array(TOTAL_FRAMES);
+    let loadedCount  = 0;
+    let allLoaded    = false;
+    let currentFrame = 0;
+    let targetFrame  = 0;
+    let scrollDirty  = false;
+
     // ── CANVAS RESIZE ───────────────────────────────────────────────────
     function resizeCanvas() {
       canvas.width  = window.innerWidth;
@@ -645,13 +653,6 @@
       const y = (canvas.height - img.naturalHeight * scale) / 2;
       ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale);
     }
-
-    // ── PRELOAD ─────────────────────────────────────────────────────────
-    const images = new Array(TOTAL_FRAMES);
-    let loadedCount = 0;
-    let allLoaded = false;
-    let currentFrame = 0;
-    let targetFrame  = 0;
 
     // jsDelivr CDN — serves GitHub files globally with zero access restrictions
     const FRAME_BASE = 'https://cdn.jsdelivr.net/gh/labsdaydream-spec/pj-portfolio@gh-pages/frames/';
@@ -692,8 +693,6 @@
     }
 
     // ── SCROLL HANDLER ──────────────────────────────────────────────────
-    let scrollDirty = false;
-
     window.addEventListener('scroll', () => {
       const maxScroll = scrollDriver.scrollHeight - window.innerHeight;
       const progress  = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
