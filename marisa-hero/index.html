@@ -653,40 +653,41 @@
     let currentFrame = 0;
     let targetFrame  = 0;
 
+    // Raw GitHub URL bypasses Pages CDN — works even while CDN propagates
+    const FRAME_BASE = 'https://raw.githubusercontent.com/labsdaydream-spec/pj-portfolio/gh-pages/frames/';
+
+    function finishLoading() {
+      if (allLoaded) return;
+      allLoaded = true;
+      drawFrame(0);
+      setTimeout(() => {
+        loadingEl.classList.add('fade-out');
+        setTimeout(() => { loadingEl.style.display = 'none'; }, 700);
+      }, 300);
+    }
+
     function preload() {
+      // Hard timeout — dismiss loading screen after 15s regardless
+      setTimeout(finishLoading, 15000);
+
       FRAME_NAMES.forEach((name, i) => {
         const img = new Image();
+        img.crossOrigin = 'anonymous';
         img.onload = () => {
           loadedCount++;
           const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
           loadingBar.style.width = pct + '%';
           loadingPct.textContent = pct + '%';
-          if (loadedCount === TOTAL_FRAMES) {
-            allLoaded = true;
-            // Draw first frame immediately
-            drawFrame(0);
-            setTimeout(() => {
-              loadingEl.classList.add('fade-out');
-              setTimeout(() => { loadingEl.style.display = 'none'; }, 700);
-            }, 300);
-          }
+          if (loadedCount === TOTAL_FRAMES) finishLoading();
         };
         img.onerror = () => {
-          // Count errored frames so loading completes even if frames are missing
           loadedCount++;
           const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
           loadingBar.style.width = pct + '%';
           loadingPct.textContent = pct + '%';
-          if (loadedCount === TOTAL_FRAMES) {
-            allLoaded = true;
-            drawFrame(0);
-            setTimeout(() => {
-              loadingEl.classList.add('fade-out');
-              setTimeout(() => { loadingEl.style.display = 'none'; }, 700);
-            }, 300);
-          }
+          if (loadedCount === TOTAL_FRAMES) finishLoading();
         };
-        img.src = './frames/' + name + '.jpg';
+        img.src = FRAME_BASE + name + '.jpg';
         images[i] = img;
       });
     }
