@@ -653,8 +653,8 @@
     let currentFrame = 0;
     let targetFrame  = 0;
 
-    // Raw GitHub URL bypasses Pages CDN — works even while CDN propagates
-    const FRAME_BASE = 'https://raw.githubusercontent.com/labsdaydream-spec/pj-portfolio/gh-pages/frames/';
+    // jsDelivr CDN — serves GitHub files globally with zero access restrictions
+    const FRAME_BASE = 'https://cdn.jsdelivr.net/gh/labsdaydream-spec/pj-portfolio@gh-pages/frames/';
 
     function finishLoading() {
       if (allLoaded) return;
@@ -667,12 +667,11 @@
     }
 
     function preload() {
-      // Hard timeout — dismiss loading screen after 15s regardless
-      setTimeout(finishLoading, 15000);
+      // Hard timeout — dismiss after 8s no matter what
+      setTimeout(finishLoading, 8000);
 
       FRAME_NAMES.forEach((name, i) => {
         const img = new Image();
-        img.crossOrigin = 'anonymous';
         img.onload = () => {
           loadedCount++;
           const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
