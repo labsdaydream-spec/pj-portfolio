@@ -581,7 +581,7 @@
           <div class="progress-track">
             <div class="progress-fill" id="progress-fill"></div>
           </div>
-          <div class="frame-counter" id="frame-counter">001 / 240</div>
+          <div class="frame-counter" id="frame-counter">001 / 144</div>
         </div>
 
       </div><!-- /overlay-ui -->
@@ -639,21 +639,9 @@
       'frame_0113','frame_0114','frame_0115','frame_0116','frame_0117','frame_0118','frame_0119','frame_0120',
       'frame_0121','frame_0122','frame_0123','frame_0124','frame_0125','frame_0126','frame_0127','frame_0128',
       'frame_0129','frame_0130','frame_0131','frame_0132','frame_0133','frame_0134','frame_0135','frame_0136',
-      'frame_0137','frame_0138','frame_0139','frame_0140','frame_0141','frame_0142','frame_0143','frame_0144',
-      'frame_0145','frame_0146','frame_0147','frame_0148','frame_0149','frame_0150','frame_0151','frame_0152',
-      'frame_0153','frame_0154','frame_0155','frame_0156','frame_0157','frame_0158','frame_0159','frame_0160',
-      'frame_0161','frame_0162','frame_0163','frame_0164','frame_0165','frame_0166','frame_0167','frame_0168',
-      'frame_0169','frame_0170','frame_0171','frame_0172','frame_0173','frame_0174','frame_0175','frame_0176',
-      'frame_0177','frame_0178','frame_0179','frame_0180','frame_0181','frame_0182','frame_0183','frame_0184',
-      'frame_0185','frame_0186','frame_0187','frame_0188','frame_0189','frame_0190','frame_0191','frame_0192',
-      'frame_0193','frame_0194','frame_0195','frame_0196','frame_0197','frame_0198','frame_0199','frame_0200',
-      'frame_0201','frame_0202','frame_0203','frame_0204','frame_0205','frame_0206','frame_0207','frame_0208',
-      'frame_0209','frame_0210','frame_0211','frame_0212','frame_0213','frame_0214','frame_0215','frame_0216',
-      'frame_0217','frame_0218','frame_0219','frame_0220','frame_0221','frame_0222','frame_0223','frame_0224',
-      'frame_0225','frame_0226','frame_0227','frame_0228','frame_0229','frame_0230','frame_0231','frame_0232',
-      'frame_0233','frame_0234','frame_0235','frame_0236','frame_0237','frame_0238','frame_0239','frame_0240'
+      'frame_0137','frame_0138','frame_0139','frame_0140','frame_0141','frame_0142','frame_0143','frame_0144'
     ];
-    var TOTAL_FRAMES = FRAME_NAMES.length; // 240
+    var TOTAL_FRAMES = FRAME_NAMES.length; // 144
 
     // ── TUNING ──────────────────────────────────────────────────────────
     var LERP_FACTOR    = 0.08;   // frame easing: 0.08 = cinematic glide
@@ -859,7 +847,7 @@
       progressFill.style.width = (progress * 100).toFixed(3) + '%';
       frameCounter.textContent =
         String(frameIdx + 1).padStart(2, '0') + ' / ' +
-        String(TOTAL_FRAMES).padStart(3, '0');
+        String(TOTAL_FRAMES).padStart(3, '0'); // 144
 
       // 7 — Scroll hint
       scrollIndicator.classList.toggle('hidden', window.scrollY > 20);
