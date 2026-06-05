@@ -120,9 +120,9 @@
       letter-spacing: 2px;
     }
 
-    /* ── SCROLL DRIVER ─────────────────────────────── */
+    /* ── SCROLL DRIVER — 1500vh for slow, granular frame control ── */
     #scroll-driver {
-      height: 600vh;
+      height: 1500vh;
       position: relative;
     }
 
@@ -136,13 +136,30 @@
       background: var(--black);
     }
 
-    /* ── CANVAS ────────────────────────────────────── */
-    #frame-canvas {
+    /* ── CANVAS WRAPPER — receives parallax transform + motion blur ── */
+    #canvas-wrapper {
+      position: absolute;
+      inset: 0;
+      transform-origin: center center;
+      will-change: transform, filter;
+    }
+
+    /* ── DUAL CANVAS LAYERS ─────────────────────────── */
+    #frame-canvas-a,
+    #frame-canvas-b {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 0;
+      display: block;
+    }
+
+    #frame-canvas-a { z-index: 0; }
+
+    #frame-canvas-b {
+      z-index: 1;
+      opacity: 0;
+      will-change: opacity;
     }
 
     /* ── AMBIENT GLOWS ─────────────────────────────── */
@@ -151,28 +168,28 @@
       inset: 0;
       background: radial-gradient(ellipse 400px 300px at 0% 0%, rgba(255,60,172,0.12), transparent);
       pointer-events: none;
-      z-index: 1;
+      z-index: 2;
     }
     .glow-tr {
       position: absolute;
       inset: 0;
       background: radial-gradient(ellipse 400px 300px at 100% 0%, rgba(0,229,255,0.10), transparent);
       pointer-events: none;
-      z-index: 1;
+      z-index: 2;
     }
     .glow-bottom {
       position: absolute;
       inset: 0;
       background: linear-gradient(to top, rgba(5,5,8,0.8) 0%, transparent 30%);
       pointer-events: none;
-      z-index: 1;
+      z-index: 2;
     }
     .canvas-overlay {
       position: absolute;
       inset: 0;
       background: rgba(5,5,8,0.25);
       pointer-events: none;
-      z-index: 1;
+      z-index: 2;
     }
 
     /* ── UI OVERLAY ────────────────────────────────── */
@@ -228,9 +245,7 @@
       transition: color 0.3s ease;
     }
 
-    .top-nav a:hover {
-      color: var(--white);
-    }
+    .top-nav a:hover { color: var(--white); }
 
     /* CENTER CONTENT */
     #center-content {
@@ -324,6 +339,7 @@
       color: var(--dim);
       text-transform: uppercase;
       white-space: nowrap;
+      transition: opacity 0.4s ease;
       animation: bounce 2s ease-in-out infinite;
     }
 
@@ -334,7 +350,7 @@
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(4px); }
+      50%       { transform: translateY(4px); }
     }
 
     .progress-track {
@@ -344,6 +360,7 @@
       position: relative;
     }
 
+    /* No CSS transition — width is driven by the lerped rAF loop */
     .progress-fill {
       position: absolute;
       top: 0;
@@ -351,7 +368,6 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
-      transition: width 0.05s linear;
     }
 
     .frame-counter {
@@ -422,9 +438,7 @@
     .product-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 2px;
     }
 
@@ -440,9 +454,15 @@
       transition: opacity 0.4s ease;
     }
 
-    .product-card:nth-child(1)::after { background: radial-gradient(ellipse at center, rgba(255,60,172,0.06), transparent 70%); }
-    .product-card:nth-child(2)::after { background: radial-gradient(ellipse at center, rgba(0,229,255,0.06), transparent 70%); }
-    .product-card:nth-child(3)::after { background: radial-gradient(ellipse at center, rgba(120,75,160,0.06), transparent 70%); }
+    .product-card:nth-child(1)::after {
+      background: radial-gradient(ellipse at center, rgba(255,60,172,0.06), transparent 70%);
+    }
+    .product-card:nth-child(2)::after {
+      background: radial-gradient(ellipse at center, rgba(0,229,255,0.06), transparent 70%);
+    }
+    .product-card:nth-child(3)::after {
+      background: radial-gradient(ellipse at center, rgba(120,75,160,0.06), transparent 70%);
+    }
 
     .product-card:hover::after { opacity: 1; }
 
@@ -517,14 +537,17 @@
     <div class="loading-pct" id="loading-pct">0%</div>
   </div>
 
-  <!-- SCROLL DRIVER -->
+  <!-- SCROLL DRIVER — 1500vh gives granular per-frame scroll control -->
   <div id="scroll-driver">
     <div id="hero-sticky">
 
-      <!-- CANVAS -->
-      <canvas id="frame-canvas"></canvas>
+      <!-- CANVAS WRAPPER — parallax scale/translate + motion blur applied here -->
+      <div id="canvas-wrapper">
+        <canvas id="frame-canvas-a"></canvas>
+        <canvas id="frame-canvas-b"></canvas>
+      </div>
 
-      <!-- AMBIENT GLOWS -->
+      <!-- AMBIENT GLOWS (sit above canvases, below UI) -->
       <div class="canvas-overlay"></div>
       <div class="glow-tl"></div>
       <div class="glow-tr"></div>
@@ -554,7 +577,7 @@
 
         <!-- BOTTOM BAR -->
         <div id="bottom-bar">
-          <div class="scroll-indicator" id="scroll-indicator">↓ Scroll to Walk</div>
+          <div class="scroll-indicator" id="scroll-indicator">&#x2193; Scroll to Walk</div>
           <div class="progress-track">
             <div class="progress-fill" id="progress-fill"></div>
           </div>
@@ -573,17 +596,17 @@
       <div class="product-card">
         <div class="product-num">01</div>
         <div class="product-name">Heel Type 01</div>
-        <div class="product-sub">Stiletto · Neon Series</div>
+        <div class="product-sub">Stiletto &middot; Neon Series</div>
       </div>
       <div class="product-card">
         <div class="product-num">02</div>
         <div class="product-name">Heel Type 02</div>
-        <div class="product-sub">Block · Cyber Edition</div>
+        <div class="product-sub">Block &middot; Cyber Edition</div>
       </div>
       <div class="product-card">
         <div class="product-num">03</div>
         <div class="product-name">Heel Type 03</div>
-        <div class="product-sub">Platform · Signal Cut</div>
+        <div class="product-sub">Platform &middot; Signal Cut</div>
       </div>
     </div>
   </section>
@@ -591,12 +614,14 @@
   <!-- PAGE FOOTER -->
   <footer id="page-footer">
     <div class="footer-mark">Marisa Shoes</div>
-    <div class="footer-sub">Walk Like a Signal · Where Cyber Meets Sole</div>
+    <div class="footer-sub">Walk Like a Signal &middot; Where Cyber Meets Sole</div>
   </footer>
 
   <script>
-    // ── FRAME LIST ──────────────────────────────────────────────────────
-    const FRAME_NAMES = [
+    'use strict';
+
+    // ── FRAME MANIFEST ──────────────────────────────────────────────────
+    var FRAME_NAMES = [
       'frame_003','frame_004','frame_005','frame_007','frame_008',
       'frame_010','frame_011','frame_013','frame_014','frame_016',
       'frame_018','frame_019','frame_020','frame_021','frame_023',
@@ -608,158 +633,251 @@
       'frame_064','frame_067','frame_068','frame_070','frame_071',
       'frame_073','frame_076','frame_077','frame_078','frame_080'
     ];
-    const TOTAL_FRAMES = FRAME_NAMES.length; // 50
+    var TOTAL_FRAMES = FRAME_NAMES.length; // 50
 
-    // ── ELEMENTS ────────────────────────────────────────────────────────
-    const canvas        = document.getElementById('frame-canvas');
-    const ctx           = canvas.getContext('2d');
-    const loadingEl     = document.getElementById('loading-overlay');
-    const loadingBar    = document.getElementById('loading-bar');
-    const loadingPct    = document.getElementById('loading-pct');
-    const progressFill  = document.getElementById('progress-fill');
-    const frameCounter  = document.getElementById('frame-counter');
-    const scrollIndicator = document.getElementById('scroll-indicator');
-    const cursor        = document.getElementById('cursor');
-    const ctaBtn        = document.getElementById('cta-btn');
-    const scrollDriver  = document.getElementById('scroll-driver');
+    // ── TUNING ──────────────────────────────────────────────────────────
+    var LERP_FACTOR    = 0.08;   // frame easing: 0.08 = cinematic glide
+    var CROSSFADE_MS   = 80;     // crossfade duration between frames in ms
+    var PARALLAX_SCALE = 0.12;   // extra CSS scale at end (1.0 -> 1.12)
+    var PARALLAX_Y_PX  = 40;     // upward push at end in px
+    var BLUR_MAX_PX    = 2;      // peak motion blur in px
+    var BLUR_THRESHOLD = 8;      // scroll delta (px/rAF frame) for full blur
+    var BLUR_LERP_IN   = 0.70;   // blur appears fast
+    var BLUR_LERP_OUT  = 0.35;   // blur clears in ~150 ms at 60 fps
+    // Cap DPR at 2 for perf; still sharp on retina displays
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-    // ── STATE — must be declared before resizeCanvas is called ──────────
-    const images   = new Array(TOTAL_FRAMES);
-    let loadedCount  = 0;
-    let allLoaded    = false;
-    let currentFrame = 0;
-    let targetFrame  = 0;
-    let scrollDirty  = false;
+    // ── DOM REFS ────────────────────────────────────────────────────────
+    var canvasWrapper   = document.getElementById('canvas-wrapper');
+    var canvasA         = document.getElementById('frame-canvas-a');
+    var canvasB         = document.getElementById('frame-canvas-b');
+    var ctxA            = canvasA.getContext('2d');
+    var ctxB            = canvasB.getContext('2d');
+    var loadingEl       = document.getElementById('loading-overlay');
+    var loadingBar      = document.getElementById('loading-bar');
+    var loadingPct      = document.getElementById('loading-pct');
+    var progressFill    = document.getElementById('progress-fill');
+    var frameCounter    = document.getElementById('frame-counter');
+    var scrollIndicator = document.getElementById('scroll-indicator');
+    var cursor          = document.getElementById('cursor');
+    var ctaBtn          = document.getElementById('cta-btn');
+    var scrollDriver    = document.getElementById('scroll-driver');
+
+    // ── STATE ──────────────────────────────────────────────────────────
+    var images      = new Array(TOTAL_FRAMES);
+    var loadedCount = 0;
+    var allLoaded   = false;
+
+    // Scroll-driven target (float) and smoothed position (float)
+    var targetFrame = 0;
+    var lerpedFrame = 0;
+    var maxScroll   = 0;
+
+    // Crossfade layer state
+    var solidFrame   = -1;    // frame currently drawn on canvasA (solid background)
+    var fadeInFrame  = -1;    // frame being faded in on canvasB
+    var fadeOpacity  = 0;     // 0 -> 1 tween for canvasB
+    var lastFrameIdx = -1;    // last integer index we triggered a transition for
+
+    // Motion blur
+    var blurAmount = 0;
+    var lastScrollY = 0;
+
+    // Opacity increment per rAF frame to complete fade in CROSSFADE_MS ms
+    var FADE_DELTA = 16.67 / CROSSFADE_MS;
+
+    // ── CONTEXT QUALITY ─────────────────────────────────────────────────
+    function applyCtxSettings(ctx) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+    }
+    applyCtxSettings(ctxA);
+    applyCtxSettings(ctxB);
 
     // ── CANVAS RESIZE ───────────────────────────────────────────────────
-    function resizeCanvas() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-      if (images[currentFrame]) drawFrame(currentFrame);
+    function resizeCanvases() {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      [canvasA, canvasB].forEach(function(c) {
+        c.width        = Math.round(w * DPR);
+        c.height       = Math.round(h * DPR);
+        c.style.width  = w + 'px';
+        c.style.height = h + 'px';
+      });
+      // Canvas resize resets context state — reapply
+      applyCtxSettings(ctxA);
+      applyCtxSettings(ctxB);
+      // Redraw current layers after resize
+      if (solidFrame  >= 0) drawOnCtx(ctxA, canvasA, solidFrame);
+      if (fadeInFrame >= 0) drawOnCtx(ctxB, canvasB, fadeInFrame);
+      maxScroll = scrollDriver.scrollHeight - window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
 
     // ── COVER-FIT DRAW ──────────────────────────────────────────────────
-    function drawFrame(index) {
-      const img = images[index];
+    // Fills the DPR-scaled canvas while preserving aspect ratio (object-fit: cover)
+    function drawOnCtx(ctx, canvas, index) {
+      var img = images[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const scale = Math.max(
-        canvas.width  / img.naturalWidth,
-        canvas.height / img.naturalHeight
-      );
-      const x = (canvas.width  - img.naturalWidth  * scale) / 2;
-      const y = (canvas.height - img.naturalHeight * scale) / 2;
+      var cw    = canvas.width;
+      var ch    = canvas.height;
+      var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+      var x     = (cw - img.naturalWidth  * scale) / 2;
+      var y     = (ch - img.naturalHeight * scale) / 2;
+      ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale);
     }
 
-    const FRAME_BASE = './frames/';
+    // ── CROSSFADE TRANSITION ─────────────────────────────────────────────
+    // canvasA = solid background layer (previous frame)
+    // canvasB = foreground layer (next frame, fades in from opacity 0 -> 1)
+    function transitionToFrame(newIdx) {
+      // Initial draw: put first frame directly on A, no crossfade needed
+      if (solidFrame === -1) {
+        drawOnCtx(ctxA, canvasA, newIdx);
+        solidFrame  = newIdx;
+        fadeOpacity = 1;
+        canvasB.style.opacity = '0';
+        return;
+      }
 
+      // Commit the most-visible frame to A before starting a new crossfade.
+      // If B was more than halfway faded in, its frame becomes the new solid.
+      var prevSolid = (fadeOpacity > 0.5 && fadeInFrame >= 0) ? fadeInFrame : solidFrame;
+      if (prevSolid !== solidFrame) {
+        drawOnCtx(ctxA, canvasA, prevSolid);
+        solidFrame = prevSolid;
+      }
+
+      // Draw new target on B, reset fade tween
+      drawOnCtx(ctxB, canvasB, newIdx);
+      fadeInFrame = newIdx;
+      fadeOpacity = 0;
+      canvasB.style.opacity = '0';
+    }
+
+    // ── IMAGE PRELOAD ───────────────────────────────────────────────────
     function finishLoading() {
       if (allLoaded) return;
       allLoaded = true;
-      drawFrame(0);
-      setTimeout(() => {
+      transitionToFrame(0);
+      lastFrameIdx = 0;
+      setTimeout(function() {
         loadingEl.classList.add('fade-out');
-        setTimeout(() => { loadingEl.style.display = 'none'; }, 700);
+        setTimeout(function() { loadingEl.style.display = 'none'; }, 700);
       }, 300);
     }
 
-    function preload() {
-      // Hard timeout — dismiss after 8s no matter what
-      setTimeout(finishLoading, 8000);
+    // Hard timeout — never block the user on failed images
+    setTimeout(finishLoading, 8000);
 
-      FRAME_NAMES.forEach((name, i) => {
-        const img = new Image();
-        img.onload = () => {
-          loadedCount++;
-          const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
-          loadingBar.style.width = pct + '%';
-          loadingPct.textContent = pct + '%';
-          if (loadedCount === TOTAL_FRAMES) finishLoading();
-        };
-        img.onerror = () => {
-          loadedCount++;
-          const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
-          loadingBar.style.width = pct + '%';
-          loadingPct.textContent = pct + '%';
-          if (loadedCount === TOTAL_FRAMES) finishLoading();
-        };
-        img.src = FRAME_BASE + name + '.jpg';
-        images[i] = img;
-      });
-    }
+    var FRAME_BASE = './frames/';
+    FRAME_NAMES.forEach(function(name, i) {
+      var img = new Image();
+      img.onload = img.onerror = function() {
+        loadedCount++;
+        var pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
+        loadingBar.style.width = pct + '%';
+        loadingPct.textContent = pct + '%';
+        if (loadedCount === TOTAL_FRAMES) finishLoading();
+      };
+      img.src = FRAME_BASE + name + '.jpg';
+      images[i] = img;
+    });
 
-    // ── SCROLL HANDLER ──────────────────────────────────────────────────
-    window.addEventListener('scroll', () => {
-      const maxScroll = scrollDriver.scrollHeight - window.innerHeight;
-      const progress  = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
-      targetFrame = Math.min(
-        Math.floor(progress * (TOTAL_FRAMES - 1)),
-        TOTAL_FRAMES - 1
-      );
-      // Update UI immediately (lightweight)
-      progressFill.style.width = (progress * 100) + '%';
-      const displayNum = targetFrame + 1;
-      frameCounter.textContent =
-        String(displayNum).padStart(2, '0') + ' / ' + String(TOTAL_FRAMES).padStart(2, '0');
-      // Hide scroll indicator after first scroll
-      if (window.scrollY > 20) {
-        scrollIndicator.classList.add('hidden');
-      } else {
-        scrollIndicator.classList.remove('hidden');
-      }
-      scrollDirty = true;
+    // ── SCROLL LISTENER ─────────────────────────────────────────────────
+    // Updates targetFrame only; all rendering happens in the rAF loop
+    window.addEventListener('scroll', function() {
+      if (maxScroll <= 0) return;
+      var progress = Math.min(window.scrollY / maxScroll, 1);
+      targetFrame  = progress * (TOTAL_FRAMES - 1);
     }, { passive: true });
 
-    // ── RAF LOOP ────────────────────────────────────────────────────────
-    function rafLoop() {
-      if (scrollDirty && allLoaded) {
-        if (currentFrame !== targetFrame) {
-          currentFrame = targetFrame;
-          drawFrame(currentFrame);
-        }
-        scrollDirty = false;
+    // ── MAIN rAF LOOP ────────────────────────────────────────────────────
+    function mainLoop() {
+      requestAnimationFrame(mainLoop);
+      if (!allLoaded) return;
+
+      // 1 — Lerp frame index (LERP_FACTOR 0.08 = cinematic ease, not snap)
+      lerpedFrame += (targetFrame - lerpedFrame) * LERP_FACTOR;
+      if (Math.abs(lerpedFrame - targetFrame) < 0.0005) lerpedFrame = targetFrame;
+
+      var frameIdx = Math.max(0, Math.min(Math.round(lerpedFrame), TOTAL_FRAMES - 1));
+
+      // 2 — Trigger crossfade whenever the integer frame changes
+      if (frameIdx !== lastFrameIdx) {
+        transitionToFrame(frameIdx);
+        lastFrameIdx = frameIdx;
       }
-      requestAnimationFrame(rafLoop);
+
+      // 3 — Advance canvasB opacity tween manually (80ms crossfade)
+      if (fadeOpacity < 1) {
+        fadeOpacity = Math.min(fadeOpacity + FADE_DELTA, 1);
+        canvasB.style.opacity = fadeOpacity.toFixed(4);
+      }
+
+      // 4 — Parallax depth: scale 1.0->1.12 and push up 0->-40px as progress runs
+      var progress  = lerpedFrame / (TOTAL_FRAMES - 1);
+      var pxScale   = 1 + progress * PARALLAX_SCALE;
+      var ty        = -(progress * PARALLAX_Y_PX);
+      canvasWrapper.style.transform =
+        'scale(' + pxScale.toFixed(5) + ') translateY(' + ty.toFixed(2) + 'px)';
+
+      // 5 — Motion blur: measure per-frame scroll delta for velocity detection
+      var delta      = Math.abs(window.scrollY - lastScrollY);
+      lastScrollY    = window.scrollY;
+      var blurTarget = delta >= BLUR_THRESHOLD ? BLUR_MAX_PX : 0;
+      var blurLerp   = blurTarget > blurAmount ? BLUR_LERP_IN : BLUR_LERP_OUT;
+      blurAmount    += (blurTarget - blurAmount) * blurLerp;
+      if (blurAmount < 0.02) blurAmount = 0;
+      canvasWrapper.style.filter = blurAmount > 0
+        ? 'blur(' + blurAmount.toFixed(3) + 'px)'
+        : '';
+
+      // 6 — Progress bar and counter driven by lerped (not raw) scroll position
+      progressFill.style.width = (progress * 100).toFixed(3) + '%';
+      frameCounter.textContent =
+        String(frameIdx + 1).padStart(2, '0') + ' / ' +
+        String(TOTAL_FRAMES).padStart(2, '0');
+
+      // 7 — Scroll hint
+      scrollIndicator.classList.toggle('hidden', window.scrollY > 20);
     }
-    requestAnimationFrame(rafLoop);
+    requestAnimationFrame(mainLoop);
 
-    // ── CUSTOM CURSOR ───────────────────────────────────────────────────
-    let cursorX = 0, cursorY = 0;
-    let cursorRenderX = 0, cursorRenderY = 0;
+    // ── CURSOR LOOP ─────────────────────────────────────────────────────
+    // Separate rAF loop: cursor stays smooth regardless of animation state
+    var cursorX = 0, cursorY = 0;
+    var cursorRX = 0, cursorRY = 0;
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', function(e) {
       cursorX = e.clientX;
       cursorY = e.clientY;
     });
 
     function cursorLoop() {
-      cursorRenderX += (cursorX - cursorRenderX) * 0.15;
-      cursorRenderY += (cursorY - cursorRenderY) * 0.15;
-      cursor.style.left = cursorRenderX + 'px';
-      cursor.style.top  = cursorRenderY + 'px';
+      cursorRX += (cursorX - cursorRX) * 0.15;
+      cursorRY += (cursorY - cursorRY) * 0.15;
+      cursor.style.left = cursorRX.toFixed(2) + 'px';
+      cursor.style.top  = cursorRY.toFixed(2) + 'px';
       requestAnimationFrame(cursorLoop);
     }
     requestAnimationFrame(cursorLoop);
 
-    ctaBtn.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-    ctaBtn.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-
-    // Also handle nav links
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    // Cursor expands on interactive elements
+    document.querySelectorAll('a, button').forEach(function(el) {
+      el.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
+      el.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
     });
 
-    // CTA smooth scroll to collection
-    ctaBtn.addEventListener('click', () => {
+    // CTA scrolls down to collection section
+    ctaBtn.addEventListener('click', function() {
       document.getElementById('collection').scrollIntoView({ behavior: 'smooth' });
     });
 
     // ── INIT ─────────────────────────────────────────────────────────────
-    preload();
+    maxScroll = scrollDriver.scrollHeight - window.innerHeight;
   </script>
 </body>
 </html>
