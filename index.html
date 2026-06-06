@@ -1,13 +1,585 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daydream Labs Portfolio Site</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marisa Shoes — Night Shift Collection 01</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:auto}
+    body{background:#05060C;overflow-x:hidden}
+    button{border:none;background:none;cursor:pointer;padding:0;outline:none}
+    @keyframes msdBounce{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(9px);opacity:.45}}
+    @keyframes msdFlick{0%,100%{opacity:1}92%{opacity:1}94%{opacity:.55}96%{opacity:1}97%{opacity:.7}98%{opacity:1}}
+    @keyframes msdCaret{0%,100%{opacity:1}50%{opacity:0}}
+    @keyframes msdFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+    @keyframes msdOrbit{0%{transform:translate(0,0)}20%{transform:translate(9px,-7px)}40%{transform:translate(13px,5px)}60%{transform:translate(2px,12px)}80%{transform:translate(-9px,4px)}100%{transform:translate(0,0)}}
+    @keyframes msdPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,0)}50%{box-shadow:0 0 22px 4px rgba(0,229,255,.25)}}
+    @keyframes msdSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes msdSpinRev{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script>
+var T={pink:'#FF3CAC',cobalt:'#2979FF',cyan:'#00E5FF',ink:'#1C1916',void:'#05060C'};
+var FB="'Poppins',sans-serif";
+var IMG='./img/';
+var TOUR_N=234,FOOTER_N=181;
+function pad4(n){return String(n).padStart(4,'0');}
+function preloadFrames(n,folder){
+  return Array.from({length:n},function(_,i){
+    var img=new Image();
+    img.src='./frames/'+folder+'/frame_'+pad4(i+1)+'.jpg';
+    return img;
+  });
+}
+var tourImgs=preloadFrames(TOUR_N,'tour');
+var footerImgs=preloadFrames(FOOTER_N,'footer');
+</script>
+
+<script type="text/babel">
+
+function NeonWord(props){
+  var size=props.size||20;
+  var PP="'Poppins',sans-serif";
+  return(
+    <span style={{display:'inline-flex',flexDirection:'column',alignItems:'center',lineHeight:1,gap:2}}>
+      <span style={{fontFamily:PP,fontSize:size,fontWeight:700,letterSpacing:size*0.16,textTransform:'uppercase',color:T.pink,
+        WebkitTextStroke:(size*0.055).toFixed(1)+'px '+T.cobalt,paintOrder:'stroke fill',
+        textShadow:'0 0 '+(size*.7)+'px rgba(255,60,172,.7),0 0 '+(size*1.4)+'px rgba(41,121,255,.4)'}}>MARISA</span>
+    </span>
+  );
+}
+
+function CanvasScrubber(props){
+  var frames=props.frames,wrapperHeight=props.wrapperHeight||'300vh',sectionHeight=props.sectionHeight||'720px',gradient=props.gradient,children=props.children;
+  var wrapRef=React.useRef(null),c1Ref=React.useRef(null),c2Ref=React.useRef(null),aliveRef=React.useRef(true);
+  React.useEffect(function(){
+    var c1=c1Ref.current,c2=c2Ref.current;
+    if(!c1||!c2)return;
+    var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
+    aliveRef.current=true;
+    var cf=0,tf=0;
+    function getProgress(){
+      var wrap=wrapRef.current;if(!wrap)return 0;
+      var rect=wrap.getBoundingClientRect(),total=wrap.offsetHeight-window.innerHeight;
+      if(total<=0)return 0;
+      return Math.max(0,Math.min(1,-rect.top/total));
+    }
+    function raf(){
+      if(!aliveRef.current)return;
+      var p=getProgress();
+      tf=p*(frames.length-1);cf+=(tf-cf)*0.13;
+      var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1);
+      var mix=cf-Math.floor(cf),bl=Math.min(Math.abs(tf-cf)*0.38,3.8);
+      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){
+        ctx1.filter=bl>0.6?'blur('+bl.toFixed(1)+'px)':'none';
+        ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);
+        ctx1.filter='none';
+      }
+      ctx2.clearRect(0,0,c2.width,c2.height);
+      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){
+        ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;
+      }
+      var sc=(1+p*0.09).toFixed(4);
+      c1.style.transform='scale('+sc+')';c2.style.transform='scale('+sc+')';
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return function(){aliveRef.current=false;};
+  },[frames]);
+  return(
+    <div ref={wrapRef} style={{position:'relative',height:wrapperHeight}}>
+      <div style={{position:'sticky',top:0,height:sectionHeight,overflow:'hidden',background:T.void}}>
+        <canvas ref={c1Ref} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        <canvas ref={c2Ref} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        {gradient&&<div style={{position:'absolute',inset:0,background:gradient,pointerEvents:'none'}}/>}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function TypeTour(){
+  var full='take a tour';
+  var ns=React.useState(0);var n=ns[0];var setN=ns[1];
+  var ds=React.useState(1);var dir=ds[0];var setDir=ds[1];
+  React.useEffect(function(){
+    var t;
+    if(dir===1&&n<full.length)t=setTimeout(function(){setN(n+1);},145);
+    else if(dir===1&&n===full.length)t=setTimeout(function(){setDir(-1);},1800);
+    else if(dir===-1&&n>0)t=setTimeout(function(){setN(n-1);},65);
+    else t=setTimeout(function(){setDir(1);},550);
+    return function(){clearTimeout(t);};
+  },[n,dir]);
+  return(
+    <div style={{display:'inline-flex',alignItems:'baseline'}}>
+      <span style={{fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:72,letterSpacing:1,textTransform:'lowercase',whiteSpace:'pre',
+        color:'#FF3CAC',WebkitTextStroke:'1.3px #2979FF',paintOrder:'stroke fill',
+        textShadow:'0 0 16px rgba(255,60,172,.6),0 0 32px rgba(41,121,255,.5),0 0 64px rgba(0,229,255,.3)'}}>
+        {full.slice(0,n)}
+      </span>
+      <span style={{display:'inline-block',width:5,height:64,marginLeft:6,background:'#00E5FF',
+        boxShadow:'0 0 14px #00E5FF,0 0 26px #00E5FF88',animation:'msdCaret 0.85s step-end infinite'}}/>
+    </div>
+  );
+}
+
+function Testimonials(){
+  var PP="'Poppins',sans-serif";
+  var PEOPLE=[
+    {id:0,name:'Amina Mwakalinga',img:'prof1',role:'Architect · Masaki',col:T.pink,bought:'For herself — the SERPENTINE',quote:"I came in for one pair and left feeling like the main character. The fitting was a private show — champagne, my stylist, and the SERPENTINE under the lights. Nothing in Dar comes close."},
+    {id:1,name:'Emmanuel Shirima',img:'prof5',role:'Surgeon · Oyster Bay',col:T.cobalt,bought:'For his wife — the AMORE boots',quote:"I wanted our anniversary to mean something. The team helped me choose the AMORE boots in her size without her knowing. When she opened the box she actually cried. That is service."},
+    {id:2,name:'Zawadi Mushi',img:'prof6',role:'Creative director · Upanga',col:T.cyan,bought:'For herself — the EMERALD',quote:"I design for a living, so I notice everything — the marble, the neon, how the shoe sits on the plinth. This is the first boutique in Tanzania that actually feels electric."},
+    {id:3,name:'Baraka Mollel',img:'prof2',role:'Entrepreneur · Mikocheni',col:T.pink,bought:"For his fiancée — the CASCADE",quote:"Proposing meant doing it right. The CASCADE sandals were waiting on the plinth when she said yes. Marisa turned a moment into a memory she still talks about."},
+    {id:4,name:'Neema Kessy',img:'prof7',role:'Event curator · Oyster Bay',col:T.cobalt,bought:'For herself + her brides',quote:"Marisa is where I send every bride who wants drama. The AMORE boots photographed like jewellery on my last client. They treat every appointment like couture."},
+    {id:5,name:'Joseph Massawe',img:'prof3',role:'Banker · Kawe',col:T.cyan,bought:'For his wife — the CLEOPATRA',quote:"My wife collects statement shoes, so impressing her is hard. The CLEOPATRA cage boots did it instantly. The stylist understood her taste better than I did."},
+    {id:6,name:'Halima Juma',img:'prof8',role:'Lawyer · Mikocheni',col:T.pink,bought:'For herself — the SCARLET',quote:"My SCARLET pumps have walked me into three boardrooms and a gala. They are loud in the best way — and worth every shilling."},
+    {id:7,name:'Daniel Mtui',img:'prof4',role:'Cardiologist · Kawe',col:T.cobalt,bought:'For his wife — the CLEOPATRA',quote:"My wife had been eyeing the CLEOPATRA cage boots for weeks. I came in alone, the stylist remembered her size, and the look on her face that evening was worth every shilling."},
+  ];
+  var ORBIT=[{r:206,s:96},{r:114,s:76},{r:206,s:86},{r:114,s:78},{r:206,s:90},{r:114,s:80},{r:206,s:72},{r:114,s:70}];
+  var as=React.useState(0);var active=as[0];var setActive=as[1];
+  var p=PEOPLE[active];
+  return(
+    <div style={{position:'relative',minHeight:560,display:'grid',gridTemplateColumns:'1fr 1.15fr',gap:30,alignItems:'center'}}>
+      <div style={{position:'relative',height:560}}>
+        <div style={{position:'absolute',left:'50%',top:'50%',width:8,height:8,borderRadius:999,transform:'translate(-50%,-50%)',background:T.cyan,boxShadow:'0 0 14px '+T.cyan+',0 0 32px '+T.cyan+'99'}}/>
+        <div style={{position:'absolute',inset:0,animation:'msdSpin 64s linear infinite'}}>
+          {PEOPLE.map(function(person,i){
+            var ang=i*(360/PEOPLE.length),o=ORBIT[i],on=active===person.id;
+            return(
+              <div key={person.id} style={{position:'absolute',left:'50%',top:'50%',width:0,height:0,transform:'rotate('+ang+'deg) translateX('+o.r+'px)'}}>
+                <div style={{position:'absolute',left:0,top:0,animation:'msdSpinRev 64s linear infinite'}}>
+                  <div style={{transform:'rotate('+(-ang)+'deg)'}}>
+                    <button onClick={function(){setActive(person.id);}} title={person.name}
+                      style={{position:'absolute',left:-o.s/2,top:-o.s/2,width:o.s,height:o.s,cursor:'pointer',borderRadius:999,overflow:'hidden',background:'#0A090C',
+                        border:'2px solid '+(on?person.col:'rgba(255,255,255,.30)'),
+                        boxShadow:on?'0 0 26px '+person.col+',0 0 52px '+person.col+'66':'0 6px 18px rgba(0,0,0,.5)',
+                        transition:'border-color .25s,box-shadow .25s'}}
+                      onMouseEnter={function(e){if(!on){e.currentTarget.style.borderColor=person.col;e.currentTarget.style.boxShadow='0 0 22px '+person.col+',0 0 44px '+person.col+'55';}}}
+                      onMouseLeave={function(e){if(active!==person.id){e.currentTarget.style.borderColor='rgba(255,255,255,.30)';e.currentTarget.style.boxShadow='0 6px 18px rgba(0,0,0,.5)';}}}>
+                      <img src={IMG+person.img+'.jpg'} alt={person.name} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',filter:on?'none':'saturate(.9)'}}/>
+                      {!on&&<span style={{position:'absolute',inset:0,background:'radial-gradient(circle,transparent 55%,'+person.col+'22 100%)'}}/>}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontFamily:PP,fontSize:10.5,fontWeight:300,letterSpacing:2,textTransform:'uppercase',color:'#8C887F'}}>Tap a profile to read their story</div>
+      </div>
+      <div key={p.id} style={{borderRadius:22,padding:'40px 44px 38px',background:'rgba(13,13,18,.5)',border:'1.6px solid '+p.col,backdropFilter:'blur(14px) saturate(140%)',WebkitBackdropFilter:'blur(14px) saturate(140%)',boxShadow:'inset 0 0 0 1px rgba(255,255,255,.06),0 0 30px '+p.col+'3A',animation:'msdFlick 0.5s'}}>
+        <div style={{display:'flex',alignItems:'center',gap:18,marginBottom:22}}>
+          <span style={{width:64,height:64,flexShrink:0,borderRadius:999,overflow:'hidden',display:'inline-block',position:'relative',background:'#0A090C',border:'2px solid '+p.col,boxShadow:'0 0 20px '+p.col+'66'}}>
+            <img src={IMG+p.img+'.jpg'} alt={p.name} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+          </span>
+          <div>
+            <div style={{fontFamily:PP,fontSize:20,fontWeight:600,letterSpacing:.3,color:'#F6F2EA'}}>{p.name}</div>
+            <div style={{fontFamily:PP,fontSize:12.5,fontWeight:300,color:p.col,marginTop:3,textShadow:'0 0 8px '+p.col+'66'}}>{p.role}</div>
+          </div>
+          <div style={{marginLeft:'auto',display:'flex',gap:4}}>
+            {[0,1,2,3,4].map(function(s){return <span key={s} style={{color:p.col,fontSize:16,textShadow:'0 0 8px '+p.col+'99'}}>★</span>;})}
+          </div>
+        </div>
+        <p style={{margin:0,fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.78,color:'#ECE7DD',textShadow:'0 1px 8px rgba(0,0,0,.4)'}}>"{p.quote}"</p>
+        <div style={{marginTop:24,display:'inline-flex',alignItems:'center',gap:9,fontFamily:PP,fontSize:11,fontWeight:500,letterSpacing:1.5,textTransform:'uppercase',color:'#080810',padding:'8px 16px',borderRadius:999,background:'linear-gradient(95deg,'+p.col+','+p.col+'CC)',boxShadow:'0 0 16px '+p.col+'55'}}>
+          ✓ {p.bought}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductModal(props){
+  var sel=props.sel,onClose=props.onClose,sizes=props.sizes,soldOut=props.soldOut,WA=props.WA,PP=props.PP;
+  var ss=React.useState(null);var size=ss[0];var setSize=ss[1];
+  var vs=React.useState(0);var variety=vs[0];var setVariety=vs[1];
+  var as=React.useState(false);var added=as[0];var setAdded=as[1];
+  var available=sizes.length>0;
+  var MATS=['Italian nappa leather','Silk satin & crystal','Patent calf leather','Crushed velvet','Suede & crystal mesh','Metallic kidskin'];
+  var mat=MATS[(sel.name.length+sel.name.charCodeAt(0))%MATS.length];
+  var heelMm=[85,95,105,110,120][sel.name.length%5];
+  var FINISHES=[{tag:sel.tone,note:'as shown'},{tag:'Crystal',note:'iced pavé'},{tag:'Noir',note:'matte black'}];
+  var specs=[['Material',mat],['Heel',(heelMm/10).toFixed(1)+' cm sculpted'],['Lining','Cushioned leather'],['Sole','Lacquered leather']];
+  var waText=encodeURIComponent("Hello Marisa Shoes, I'd like to order the "+sel.name+" ("+sel.desc+", "+FINISHES[variety].tag+" finish) — TZS "+sel.price+(size?", size EU "+size:"")+".");
+  var waHref="https://wa.me/"+WA+"?text="+waText;
+  function addToCart(){if(!size)return;setAdded(true);setTimeout(function(){setAdded(false);},1900);}
+  var top=Math.max(28,Math.min((sel.y||0)-40,(sel.secH||2400)-628));
+  return(
+    <div onClick={onClose} style={{position:'absolute',inset:0,zIndex:9999,background:'rgba(5,5,8,.72)',backdropFilter:'blur(7px)',animation:'msdFlick .35s'}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{position:'absolute',top:top,left:'50%',transform:'translateX(-50%)',width:940,maxWidth:'calc(100% - 80px)',display:'grid',gridTemplateColumns:'0.92fr 1.08fr',borderRadius:22,overflow:'hidden',background:'rgba(13,13,18,.92)',border:'1.6px solid '+sel.col,boxShadow:'0 0 44px '+sel.col+'55,0 30px 80px rgba(0,0,0,.6)'}}>
+        <div style={{position:'relative',minHeight:560,background:'#0A090C'}}>
+          <img src={IMG+sel.file+'.jpg'} alt={sel.name} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+          <span style={{position:'absolute',bottom:16,left:18,fontFamily:PP,fontSize:10,fontWeight:600,letterSpacing:1.5,textTransform:'uppercase',color:sel.col}}>{FINISHES[variety].tag}</span>
+        </div>
+        <div style={{padding:'34px 36px 30px',display:'flex',flexDirection:'column'}}>
+          <div style={{fontFamily:PP,fontSize:10.5,fontWeight:500,letterSpacing:3,textTransform:'uppercase',color:sel.col,marginBottom:9}}>Marisa · Night Shift</div>
+          <h3 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:28,letterSpacing:.5,color:'#F6F2EA'}}>{sel.name}</h3>
+          <div style={{fontFamily:PP,fontSize:13.5,fontWeight:300,fontStyle:'italic',color:'#B8B3A8',marginTop:5}}>{sel.desc}</div>
+          <div style={{display:'flex',alignItems:'baseline',gap:8,marginTop:14}}>
+            <span style={{fontFamily:PP,fontSize:11,letterSpacing:1.5,color:'#7E7A72'}}>TZS</span>
+            <span style={{fontFamily:PP,fontSize:25,fontWeight:600,color:'#F6F2EA'}}>{sel.price}</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px 18px',marginTop:18,paddingTop:16,borderTop:'1px solid rgba(255,255,255,.10)'}}>
+            {specs.map(function(kv){return(<div key={kv[0]}><div style={{fontFamily:PP,fontSize:9,fontWeight:600,letterSpacing:2,textTransform:'uppercase',color:sel.col}}>{kv[0]}</div><div style={{fontFamily:PP,fontSize:12.5,fontWeight:300,color:'#E7E2D8',marginTop:2}}>{kv[1]}</div></div>);})}
+          </div>
+          <div style={{marginTop:18}}>
+            <div style={{fontFamily:PP,fontSize:10,fontWeight:600,letterSpacing:2,textTransform:'uppercase',color:'#CFCABF',marginBottom:9}}>Varieties</div>
+            <div style={{display:'flex',gap:10}}>
+              {FINISHES.map(function(f,vi){var on=variety===vi;return(
+                <button key={f.tag} onClick={function(){setVariety(vi);}} style={{cursor:'pointer',borderRadius:12,overflow:'hidden',width:76,background:'#0A090C',border:'1.6px solid '+(on?sel.col:'rgba(255,255,255,.16)'),textAlign:'left',boxShadow:on?'0 0 16px '+sel.col+'66':'none',transition:'border-color .2s,box-shadow .2s'}}>
+                  <span style={{display:'block',position:'relative',height:60}}>
+                    <img src={IMG+sel.file+'.jpg'} alt={f.tag} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',filter:vi===1?'saturate(1.3) brightness(1.05)':vi===2?'grayscale(1) brightness(.7)':'none'}}/>
+                  </span>
+                  <span style={{display:'block',padding:'5px 7px 6px'}}>
+                    <span style={{display:'block',fontFamily:PP,fontSize:10,fontWeight:600,color:on?'#F6F2EA':'#C7C2B8',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{f.tag}</span>
+                    <span style={{display:'block',fontFamily:PP,fontSize:9,fontWeight:300,color:'#8C887F'}}>{f.note}</span>
+                  </span>
+                </button>
+              );})}
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:9,marginTop:16}}>
+            <span style={{width:9,height:9,borderRadius:999,background:available?'#22D27A':'#E0556B',boxShadow:'0 0 10px '+(available?'#22D27A':'#E0556B')}}/>
+            <span style={{fontFamily:PP,fontSize:12,fontWeight:500,color:available?'#9BE8C0':'#F3A6B2'}}>{available?'In stock · ready to ship from Oyster Bay':'Made to order · 2–3 weeks'}</span>
+          </div>
+          <div style={{marginTop:16}}>
+            <div style={{fontFamily:PP,fontSize:10,fontWeight:600,letterSpacing:2,textTransform:'uppercase',color:'#CFCABF',marginBottom:9}}>Select size (EU)</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7}}>
+              {[35,36,37,38,39,40,41,42,43].map(function(sz){
+                var has=sizes.indexOf(sz)!==-1&&!soldOut(sel.name,sz),on=size===sz;
+                return(<button key={sz} disabled={!has} onClick={function(){setSize(sz);}} style={{width:40,height:40,borderRadius:10,cursor:has?'pointer':'not-allowed',fontFamily:PP,fontSize:13,fontWeight:on?600:400,color:!has?'#55525A':on?'#080810':'#E7E2D8',background:on?'linear-gradient(95deg,'+sel.col+','+sel.col+'CC)':'rgba(16,16,22,.5)',border:on?'1px solid transparent':'1px solid '+(has?'rgba(0,229,255,.34)':'rgba(255,255,255,.10)'),textDecoration:has?'none':'line-through',boxShadow:on?'0 0 14px '+sel.col+'66':'none',transition:'all .15s'}}>{sz}</button>);
+              })}
+            </div>
+          </div>
+          <div style={{display:'flex',gap:10,marginTop:'auto',paddingTop:22}}>
+            <button onClick={addToCart} disabled={!size} style={{flex:1,textAlign:'center',cursor:size?'pointer':'not-allowed',fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:2,textTransform:'uppercase',color:size?'#080810':'#9A958B',padding:'15px 18px',borderRadius:999,border:size?'1px solid transparent':'1px solid rgba(255,255,255,.14)',background:added?'linear-gradient(95deg,#1FB463,#22D27A)':size?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 55%,'+T.cyan+')':'rgba(16,16,22,.5)',boxShadow:size?'0 0 22px '+T.cobalt+'55':'none',transition:'background .2s'}}>
+              {added?'Added to bag ✓':size?'Add to Cart':'Select your size'}
+            </button>
+            <a href={waHref} target="_blank" rel="noreferrer" style={{flexShrink:0,display:'inline-flex',alignItems:'center',justifyContent:'center',gap:8,textDecoration:'none',fontFamily:PP,fontSize:12,fontWeight:600,letterSpacing:1.5,textTransform:'uppercase',color:'#F6F2EA',padding:'15px 20px',borderRadius:999,background:'rgba(16,16,22,.5)',border:'1.4px solid '+T.cyan,boxShadow:'0 0 14px '+T.cyan+'33'}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill={T.cyan}><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.2-.2-1.2-1.5-1.2-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.3.1.6-.1 1.1z"/></svg>
+              Order
+            </a>
+          </div>
+        </div>
+        <button onClick={onClose} style={{position:'absolute',top:16,right:16,width:36,height:36,borderRadius:999,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',fontFamily:PP,fontSize:16,color:'#F6F2EA',background:'rgba(8,8,11,.6)',border:'1px solid '+sel.col+'88',boxShadow:'0 0 14px '+sel.col+'44'}}>✕</button>
+      </div>
+    </div>
+  );
+}
+
+function Catalog(props){
+  var seamless=props.seamless;
+  var PP="'Poppins',sans-serif";
+  var NEON=[T.pink,T.cobalt,T.cyan];
+  var filtLabel={fontFamily:PP,fontSize:11,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 10px '+T.cyan+'55'};
+  function Drop(dp){var children=dp.children,accent=dp.accent||T.cyan;return(<span style={{display:'inline-flex',alignItems:'center',gap:12,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+accent+'88',backdropFilter:'blur(8px)',boxShadow:'0 0 12px '+accent+'22',fontFamily:PP,fontSize:12.5,fontWeight:400,color:'#F1ECE2',letterSpacing:.5}}>{children}<span style={{color:accent,fontSize:10}}>▾</span></span>);}
+  function Chip(cp){var children=cp.children,active=cp.active;return(<span style={{borderRadius:999,padding:'8px 16px',fontFamily:PP,fontSize:12,fontWeight:active?600:400,letterSpacing:.8,color:active?'#080810':'#E7E2D8',background:active?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')'  :'rgba(16,16,22,.4)',border:active?'1px solid transparent':'1px solid rgba(0,229,255,.4)',backdropFilter:'blur(8px)',boxShadow:active?'0 0 18px '+T.cobalt+'55':'none'}}>{children}</span>);}
+  function Toggle(tp){return(<span style={{display:'inline-flex',borderRadius:999,overflow:'hidden',border:'1px solid rgba(0,229,255,.4)',fontFamily:PP,fontSize:11.5,letterSpacing:.5}}><span style={{padding:'8px 15px',color:'#080810',fontWeight:600,background:'linear-gradient(95deg,'+T.cobalt+','+T.cyan+')'}}>{tp.on}</span><span style={{padding:'8px 15px',color:'#CFCABF',background:'rgba(16,16,22,.4)'}}>{tp.off}</span></span>);}
+  var PAGESRAW=[
+    [['s17','SERPENTINE','crystal snake-wrap stiletto','antique gold','1,950,000'],['s21','SAPPHIRE','crystal mesh bootie','midnight blue','1,780,000'],['s29','EMERALD','jewelled velvet bootie','emerald','1,820,000'],['s24','SCARLET','glossy patent pump','lacquer red','850,000'],['s18','CASCADE','crystal chain leg sandal','silver','1,690,000'],['s05','ROUGE ROSE','rose-bloom platform heel','crimson','1,240,000'],['s13','LAGOON','crystal knit sandal','teal','1,450,000'],['s27','MIDAS','metallic pointed pump','liquid gold','980,000'],['s10','AMORE','pearl heart tall boot','ivory','2,000,000'],['s02','CLEOPATRA','beaded cage boot','pharaoh gold','1,880,000'],['s12','NOIR ROSE','rose-lace bootie','burgundy','1,320,000'],['s19','HALO','strappy ankle sandal','liquid gold','720,000']],
+    [['n01','MANIFESTO','shirt-collar stiletto bootie','white & magenta','1,180,000'],['n02','BAROQUE','filigree patent pump','oxblood','1,560,000'],['n03','ASH','metal-heel suede pump','dove grey','760,000'],['n04','BLUSH PEARL','pearl-cuff pump','rose','820,000'],['n05','BORDEAUX','pearl-cuff pump','wine','840,000'],['n06','ROUGE BOW','satin bow pump','burgundy','880,000'],['n07','VELOUR','buckle block heel','burgundy','790,000'],['n08','DOVE BOW','satin bow pump','silver','810,000'],['n09','LACE CAGE','lace-up cutout bootie','nude','950,000'],['n10','GLADIATRIX','studded cage boot','nude','1,290,000'],['n11','SNOWWEB','crochet net bootie','ivory','1,050,000'],['n12','TALISMAN','studded mandala sandal','jet','1,140,000']],
+    [['n13','VANGUARD','studded gold-heel boot','black & gold','1,620,000'],['n14','GILDED ZIP','gold-zip ankle bootie','jet black','980,000'],['n15','PYTHON','snake-heel ankle bootie','jet black','1,020,000'],['n16','ZEBRA','crystal zebra pump','monochrome','1,210,000'],['n17','STARDUST','glitter cutout lace-up pump','black & silver','1,160,000'],['n18','COMET','diamanté swirl pump','jet black','1,090,000'],['n19','VIPER','snake lace-up pump','python','1,070,000'],['n20','LEOPARD BOW','glitter leopard bow pump','leopard','990,000'],['n21','POLKA','polka-dot bow pump','monochrome','880,000'],['n22','DOTTED','mesh polka bow heel','monochrome','860,000'],['n23','POLKA SHEER','sheer polka sling','monochrome','900,000'],['n24','GOLD ZEBRA',"crystal d'orsay pump",'black & gold','1,340,000']],
+    [['n25','ATHENA','strappy caged heel','white','1,010,000'],['n26','PETAL','floral appliqué bootie','nude','1,520,000'],['n27','RUBY BOW','satin bow ankle pump','crimson','870,000'],['n28','SCARLET BOW','suede bow pump','red','830,000'],['n29','MIDNIGHT LEAF','leaf-heel satin pump','sapphire','1,720,000'],['n30','LOVESTRUCK','heart-toe patent stiletto','black & gold','1,260,000'],['s03','ROUGE CRYSTAL','embellished sheer bootie','crimson','1,480,000'],['s04','DECO BOW','bow pump w/ gold cuff','jet','940,000'],['s06','RUCHE','ruched lace-up bootie','burgundy','1,150,000'],['s07','VELVET LACE','velvet lace-up boot','burgundy','1,390,000'],['s08','BLUSH LACE','sheer lace boot','blush','1,280,000'],['s09','IVORY LACE','lace tall boot w/ bow','ivory','1,330,000']],
+  ];
+  var PAGES=[PAGESRAW[1],PAGESRAW[2],PAGESRAW[0],PAGESRAW[3]];
+  var SIG=2,TOTAL=PAGES.reduce(function(a,p){return a+p.length;},0);
+  var ps=React.useState(0);var page=ps[0];var setPage=ps[1];
+  var items=PAGES[page];
+  var sels=React.useState(null);var sel=sels[0];var setSel=sels[1];
+  var WA='255791696849';
+  function sizesFor(name){var all=[35,36,37,38,39,40,41,42,43],seed=name.length+name.charCodeAt(0);return all.filter(function(sz,k){return(seed+k*3)%7!==0;});}
+  function soldOut(name,sz){var seed=name.length+name.charCodeAt(name.length-1);return(seed+sz)%5===0;}
+  return(
+    <section style={{position:'relative',overflow:'hidden',background:seamless?'transparent':'#0B0A0C',padding:seamless?'90px 70px 56px':'90px 70px 100px'}}>
+      {!seamless&&<div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>}
+      {!seamless&&<div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.36))'}}/>}
+      <div style={{position:'relative'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:30}}>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:14}}>
+              <span style={{width:34,height:2,background:'linear-gradient(90deg,'+T.pink+','+T.cyan+')',boxShadow:'0 0 8px '+T.cyan+'88'}}/>
+              <span style={{fontFamily:PP,fontSize:13,fontWeight:500,letterSpacing:4,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'66'}}>The Collection</span>
+            </div>
+            <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:46,lineHeight:1.12,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>Night Shift — every pair on the floor</h2>
+          </div>
+          <span style={{fontFamily:PP,fontSize:13,fontWeight:300,color:'#CFCABF'}}>{TOTAL} styles</span>
+        </div>
+        <div style={{borderRadius:20,border:'1.5px solid '+T.cyan,overflow:'hidden',background:'rgba(12,12,17,.34)',backdropFilter:'blur(12px) saturate(140%)',boxShadow:'0 0 26px '+T.cyan+'33,inset 0 0 0 1px rgba(255,255,255,.06)',marginBottom:26}}>
+          <div style={{display:'flex',alignItems:'center',gap:36,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
+            <span style={filtLabel}>Window</span>
+            <div style={{display:'flex',gap:10}}><Drop>Sales</Drop><Drop accent={T.pink}>20%</Drop></div>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
+            <span style={filtLabel}>Product line</span><Drop>All</Drop>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
+            <span style={filtLabel}>Size</span>
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontFamily:PP,fontSize:11,color:'#CFCABF'}}>35</span>
+              <div style={{position:'relative',width:180,height:4,borderRadius:999,background:'rgba(255,255,255,.16)'}}>
+                <div style={{position:'absolute',left:0,top:0,bottom:0,width:'64%',borderRadius:999,background:'linear-gradient(90deg,'+T.cobalt+','+T.cyan+')'}}/>
+                <span style={{position:'absolute',left:'64%',top:'50%',transform:'translate(-50%,-50%)',width:16,height:16,borderRadius:999,background:'#0B0A0C',border:'2px solid '+T.cyan,boxShadow:'0 0 12px '+T.cyan}}/>
+              </div>
+              <span style={{fontFamily:PP,fontSize:11,color:'#CFCABF'}}>43</span>
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:28,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
+            <span style={filtLabel}>Type</span>
+            <div style={{display:'flex',gap:9,flexWrap:'wrap'}}>
+              {['Stiletto','Pump','Boot','Sandal','Platform','Slingback'].map(function(t,i){return <Chip key={t} active={i===0}>{t}</Chip>;})}
+            </div>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
+            <span style={filtLabel}>Heels</span><Toggle on="With" off="Without"/>
+            <span style={filtLabel}>Color</span>
+            <div style={{display:'flex',gap:9,alignItems:'center'}}>
+              {['#16161C','#C7A98A','#86202C','#C2A766',T.pink,T.cyan,T.cobalt,'#E9E4DA'].map(function(c,i){return(<span key={i} style={{width:18,height:18,borderRadius:999,background:c,border:i===4?'2px solid #fff':'1px solid rgba(255,255,255,.35)',boxShadow:i===4?'0 0 12px '+T.pink:'none'}}/>);})}
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',padding:'16px 24px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:14}}>
+              <span style={filtLabel}>Sort by</span>
+              <div style={{display:'flex',gap:9}}>
+                {['New Arrivals','Price Low','Price High','Name'].map(function(s,i){return <Chip key={s} active={i===0}>{s}</Chip>;})}
+              </div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:12}}><span style={filtLabel}>Per page</span><Drop>12</Drop></div>
+          </div>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+          <span style={{fontFamily:PP,fontSize:12.5,fontWeight:300,letterSpacing:1,color:'#CFCABF'}}>
+            Showing <span style={{color:'#F6F2EA',fontWeight:600}}>{page*12+1}–{page*12+items.length}</span> of {TOTAL} · <span style={{color:T.cyan}}>{page===SIG?'the signature edit':'new arrivals'}</span>
+          </span>
+          <span style={{fontFamily:PP,fontSize:12,letterSpacing:1,color:T.pink,borderBottom:'1px solid '+T.pink+'66',paddingBottom:3,cursor:'pointer'}}>Clear filters ✕</span>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:22}}>
+          {items.map(function(item,i){
+            var file=item[0],name=item[1],desc=item[2],tone=item[3],price=item[4];
+            return(
+              <div key={file} onClick={function(e){var secEl=e.currentTarget.closest('section');var y=0,el=e.currentTarget;while(el&&el!==secEl){y+=el.offsetTop||0;el=el.offsetParent;}setSel({file:file,name:name,desc:desc,tone:tone,price:price,col:NEON[i%3],y:y,secH:secEl?secEl.offsetHeight:0});}}
+                style={{borderRadius:16,overflow:'hidden',cursor:'pointer',border:'1px solid '+NEON[i%3]+'55',background:'rgba(12,12,17,.40)',backdropFilter:'blur(6px)',boxShadow:'0 0 16px '+NEON[i%3]+'22',transition:'transform .25s,box-shadow .25s,border-color .25s'}}
+                onMouseEnter={function(e){e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 0 26px '+NEON[i%3]+'66';e.currentTarget.style.borderColor=NEON[i%3];}}
+                onMouseLeave={function(e){e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 0 16px '+NEON[i%3]+'22';e.currentTarget.style.borderColor=NEON[i%3]+'55';}}>
+                <div style={{position:'relative',height:360,overflow:'hidden',background:'#0A090C'}}>
+                  <img src={IMG+file+'.jpg'} alt={name+' — '+desc} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+                  <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'linear-gradient(180deg,rgba(8,7,10,.10) 0%,transparent 30%,transparent 72%,rgba(8,7,10,.55) 100%)'}}/>
+                  {i===0&&<span style={{position:'absolute',top:14,left:14,fontFamily:PP,fontSize:9,fontWeight:600,letterSpacing:2,color:'#080810',background:page===SIG?T.cyan:T.pink,padding:'4px 9px',borderRadius:6,zIndex:2}}>{page===SIG?'SIGNATURE':'NEW DROP'}</span>}
+                  <span style={{position:'absolute',top:12,right:12,fontFamily:PP,fontSize:9,fontWeight:500,color:'#F6F2EA',background:'rgba(8,8,11,.6)',backdropFilter:'blur(6px)',border:'1px solid '+NEON[i%3]+'88',padding:'5px 9px',borderRadius:999,zIndex:2}}>Quick view +</span>
+                  <span style={{position:'absolute',bottom:12,left:14,fontFamily:PP,fontSize:9.5,fontWeight:600,letterSpacing:1.5,textTransform:'uppercase',color:NEON[i%3],zIndex:2}}>{tone}</span>
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',padding:'14px 16px 15px',borderTop:'1px solid '+NEON[i%3]+'44'}}>
+                  <div style={{minWidth:0}}>
+                    <div style={{fontFamily:PP,fontSize:14,fontWeight:600,letterSpacing:1.2,color:'#F6F2EA'}}>{name}</div>
+                    <div style={{fontFamily:PP,fontSize:11,fontWeight:300,fontStyle:'italic',color:'#B8B3A8',marginTop:3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{desc}</div>
+                  </div>
+                  <div style={{textAlign:'right',flexShrink:0,marginLeft:10}}>
+                    <div style={{fontFamily:PP,fontSize:8.5,letterSpacing:1.5,color:'#7E7A72'}}>TZS</div>
+                    <div style={{fontFamily:PP,fontSize:14,fontWeight:600,color:'#F6F2EA'}}>{price}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:10,marginTop:50}}>
+          {(function(){
+            function btn(label,target,disabled,active){return(<button key={label+'-'+target} disabled={disabled} onClick={function(){if(!disabled)setPage(target);}} style={{minWidth:38,height:38,display:'inline-flex',alignItems:'center',justifyContent:'center',borderRadius:10,fontFamily:PP,fontSize:13,fontWeight:active?600:400,cursor:disabled?'default':'pointer',opacity:disabled?0.35:1,color:active?'#080810':'#E7E2D8',background:active?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')'  :'rgba(16,16,22,.4)',border:active?'1px solid transparent':'1px solid rgba(0,229,255,.34)',backdropFilter:'blur(8px)',boxShadow:active?'0 0 16px '+T.cobalt+'55':'none',transition:'box-shadow .2s,border-color .2s'}} onMouseEnter={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor=T.cyan;e.currentTarget.style.boxShadow='0 0 14px '+T.cyan+'66';}}} onMouseLeave={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor='rgba(0,229,255,.34)';e.currentTarget.style.boxShadow='none';}}}>{label}</button>);}
+            var btns=[btn('‹',Math.max(0,page-1),page===0,false)];
+            PAGES.forEach(function(_,idx){btns.push(btn(String(idx+1),idx,false,idx===page));});
+            btns.push(btn('›',Math.min(PAGES.length-1,page+1),page===PAGES.length-1,false));
+            return btns;
+          })()}
+        </div>
+      </div>
+      {sel&&<ProductModal sel={sel} onClose={function(){setSel(null);}} sizes={sizesFor(sel.name)} soldOut={soldOut} WA={WA} PP={PP}/>}
+    </section>
+  );
+}
+
+function HeroMarbleNeon(){
+  var PP="'Poppins',sans-serif";
+  var nav=['NEW IN','HEELS','BOOTS','THE COSPLAY EDIT','STORES'];
+  var neonLine='linear-gradient(90deg,'+T.pink+','+T.cobalt+','+T.cyan+')';
+  var footerSec=React.useRef(null),footerC1=React.useRef(null),footerC2=React.useRef(null),footerAlive=React.useRef(true);
+  React.useEffect(function(){
+    var c1=footerC1.current,c2=footerC2.current,sec=footerSec.current;
+    if(!c1||!c2||!sec)return;
+    var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
+    footerAlive.current=true;
+    var frames=footerImgs,cf=0,tf=0;
+    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height*0.55)));}
+    function raf(){
+      if(!footerAlive.current)return;
+      var p=getProgress();tf=p*(frames.length-1);cf+=(tf-cf)*0.13;
+      var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1),mix=cf-Math.floor(cf),bl=Math.min(Math.abs(tf-cf)*0.38,3.8);
+      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){ctx1.filter=bl>0.6?'blur('+bl.toFixed(1)+'px)':'none';ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);ctx1.filter='none';}
+      ctx2.clearRect(0,0,c2.width,c2.height);
+      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;}
+      var sc=(1+p*0.09).toFixed(4);c1.style.transform='scale('+sc+')';c2.style.transform='scale('+sc+')';
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return function(){footerAlive.current=false;};
+  },[]);
+
+  return(
+    <div style={{width:1440,fontFamily:FB,background:'#F3EFE6 url('+IMG+'marble_bg.png) center/cover',color:T.ink}}>
+
+      {/* HERO */}
+      <div style={{position:'relative',height:900,overflow:'hidden',background:T.void}}>
+        <video src="uploads/202606052138.mp4" autoPlay muted loop playsInline style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,7,16,.34) 0%,transparent 22%,transparent 55%,rgba(5,7,16,.55) 100%)'}}/>
+        <header style={{position:'absolute',top:0,left:0,right:0,height:84,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 46px',background:'linear-gradient(180deg,rgba(10,13,26,.30),rgba(10,13,26,.06))',backdropFilter:'blur(13px) saturate(150%)',WebkitBackdropFilter:'blur(13px) saturate(150%)',borderBottom:'1px solid transparent',borderImage:neonLine+' 1',boxShadow:'inset 0 -1px 16px rgba(0,229,255,.10)'}}>
+          <nav style={{display:'flex',gap:28}}>
+            {nav.map(function(n){return(<span key={n} style={{fontFamily:FB,fontSize:11,fontWeight:300,letterSpacing:2.5,textTransform:'uppercase',color:n==='THE COSPLAY EDIT'?T.pink:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)',cursor:'pointer'}}>{n}</span>);})}
+          </nav>
+          <NeonWord size={19}/>
+          <div style={{display:'flex',gap:22,alignItems:'center',fontFamily:FB,fontSize:11,letterSpacing:2,color:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)'}}>
+            <span style={{cursor:'pointer'}}>SEARCH</span><span style={{cursor:'pointer'}}>ACCOUNT</span>
+            <span style={{color:T.cyan,textShadow:'0 0 10px '+T.cyan+'99',cursor:'pointer'}}>BAG ⟨0⟩</span>
+          </div>
+        </header>
+        <div style={{position:'absolute',left:50,bottom:84,maxWidth:1000}}>
+          <div style={{fontFamily:FB,fontSize:11,fontWeight:400,letterSpacing:5,textTransform:'uppercase',color:T.cyan,marginBottom:20,textShadow:'0 0 12px '+T.cyan+'88'}}>Night Shift · Collection 01</div>
+          <h1 style={{margin:0,fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:44,lineHeight:1.1,letterSpacing:0.5,whiteSpace:'nowrap',textTransform:'lowercase',color:T.pink,WebkitTextStroke:'1.1px '+T.cobalt,paintOrder:'stroke fill',textShadow:'0 0 14px rgba(255,60,172,.6),0 0 28px rgba(41,121,255,.5),0 0 52px rgba(0,229,255,.3)',animation:'msdFlick 6s infinite'}}>
+            feel electric, feel the power
+          </h1>
+        </div>
+        <div style={{position:'absolute',left:0,right:0,bottom:30,display:'flex',flexDirection:'column',alignItems:'center',gap:9}}>
+          <span style={{fontFamily:FB,fontSize:9,letterSpacing:4,textTransform:'uppercase',color:'#CDE6FF',textShadow:'0 1px 6px rgba(0,0,0,.5)'}}>Scroll</span>
+          <svg width="26" height="16" viewBox="0 0 26 16" fill="none" style={{animation:'msdBounce 1.8s ease-in-out infinite',filter:'drop-shadow(0 0 7px '+T.cyan+') drop-shadow(0 0 10px '+T.pink+'88)'}}>
+            <path d="M2 2 L13 13 L24 2" stroke={T.cyan} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* ABOUT */}
+      <section style={{padding:'96px 70px 104px',position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
+        <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.34),rgba(8,7,10,.22))'}}/>
+        <div style={{position:'relative',display:'grid',gridTemplateColumns:'1fr 1.05fr',gap:64,alignItems:'center'}}>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:24}}>
+              <span style={{width:34,height:2,background:'linear-gradient(90deg,'+T.pink+','+T.cyan+')',boxShadow:'0 0 8px '+T.cyan+'88'}}/>
+              <span style={{fontFamily:PP,fontSize:13,fontWeight:500,letterSpacing:4,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'66'}}>The House of Marisa</span>
+            </div>
+            <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:50,lineHeight:1.16,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>A house built for the woman who arrives.</h2>
+            <p style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'30px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>Marisa Shoes exists for the high-class creative woman — the one who designs whole worlds in her head and then walks out the door wearing one. Our purpose is simple: to make her feel electric the moment she steps onto the floor.</p>
+            <p style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'22px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>In our Oyster Bay atelier in Dar es Salaam, marble calm meets neon current. We exist to dress the character you are becoming, one client at a time, under the chandelier.</p>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginTop:44}}>
+              {[['01','Craft','Every pair chosen, never mass-stocked.',T.pink],['02','Power','Heels engineered to command a room.',T.cobalt],['03','Ritual','A private floor, champagne, your stylist.',T.cyan]].map(function(it){return(
+                <div key={it[0]} style={{borderRadius:16,padding:'20px 18px 22px',background:'rgba(18,18,24,.34)',border:'1.5px solid '+it[3],boxShadow:'inset 0 0 0 1px rgba(255,255,255,.08),0 0 18px '+it[3]+'40',backdropFilter:'blur(10px) saturate(140%)',WebkitBackdropFilter:'blur(10px) saturate(140%)'}}>
+                  <div style={{fontFamily:PP,fontSize:12,fontWeight:600,letterSpacing:2,color:it[3],textShadow:'0 0 10px '+it[3]+'88'}}>{it[0]}</div>
+                  <div style={{fontFamily:PP,fontSize:18,fontWeight:600,color:'#F6F2EA',margin:'9px 0 7px'}}>{it[1]}</div>
+                  <div style={{fontFamily:PP,fontSize:14,fontWeight:300,lineHeight:1.55,color:'#D4CFC4'}}>{it[2]}</div>
+                </div>
+              );})}
+            </div>
+            <div style={{marginTop:40}}>
+              <span style={{display:'inline-flex',alignItems:'center',gap:10,cursor:'pointer',fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:3,textTransform:'uppercase',color:'#080810',padding:'16px 38px',borderRadius:999,background:'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 52%,'+T.cyan+')',boxShadow:'0 0 24px '+T.cobalt+'66,0 0 14px '+T.pink+'55,inset 0 0 0 1px rgba(255,255,255,.25)'}}>BOOK A FITTING</span>
+            </div>
+          </div>
+          <figure style={{margin:0,position:'relative'}}>
+            <div style={{borderRadius:22,overflow:'hidden',position:'relative',border:'2px solid '+T.cyan,boxShadow:'0 0 0 1px rgba(255,255,255,.18),0 0 30px '+T.cyan+'4A,0 26px 60px rgba(0,0,0,.5)'}}>
+              <img src={IMG+'interior_wide.png'} alt="Inside the Marisa store" style={{display:'block',width:'100%',height:600,objectFit:'cover'}}/>
+              <div style={{position:'absolute',inset:0,pointerEvents:'none',boxShadow:'inset 0 0 60px '+T.cobalt+'1F'}}/>
+            </div>
+            <figcaption style={{position:'absolute',left:18,bottom:18,borderRadius:999,padding:'10px 20px',background:'rgba(10,13,26,.45)',backdropFilter:'blur(10px)',border:'1px solid '+T.pink,boxShadow:'0 0 16px '+T.pink+'55',fontFamily:PP,fontSize:12,fontWeight:400,letterSpacing:2,textTransform:'uppercase',color:'#F4F0FF'}}>Oyster Bay · Dar es Salaam</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      {/* SECTION 03 · TOUR — sticky scroll-driven canvas scrubber */}
+      <CanvasScrubber frames={tourImgs} wrapperHeight="350vh" sectionHeight="720px" gradient="radial-gradient(120% 90% at 50% 50%,rgba(5,7,16,.18),rgba(5,7,16,.55))">
+        <div style={{position:'absolute',inset:0,display:'flex',alignItems:'flex-end',justifyContent:'flex-start',padding:'0 0 64px 50px'}}>
+          <TypeTour/>
+        </div>
+      </CanvasScrubber>
+
+      {/* CATALOG + TESTIMONIALS */}
+      <div style={{position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
+        <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.46))'}}/>
+        <div style={{position:'relative'}}>
+          <Catalog seamless={true}/>
+          <section style={{position:'relative',overflow:'hidden',padding:'34px 70px 110px'}}>
+            <div style={{position:'relative'}}>
+              <div style={{textAlign:'center',marginBottom:54}}>
+                <div style={{display:'inline-flex',alignItems:'center',gap:12,marginBottom:16}}>
+                  <span style={{width:34,height:2,background:'linear-gradient(90deg,transparent,'+T.cyan+')',boxShadow:'0 0 8px '+T.cyan+'88'}}/>
+                  <span style={{fontFamily:PP,fontSize:13,fontWeight:500,letterSpacing:4,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'66'}}>Words from the floor</span>
+                  <span style={{width:34,height:2,background:'linear-gradient(90deg,'+T.cyan+',transparent)',boxShadow:'0 0 8px '+T.cyan+'88'}}/>
+                </div>
+                <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:46,lineHeight:1.14,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>The women who walk in voltage</h2>
+              </div>
+              <Testimonials/>
+              <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:40,marginTop:56,flexWrap:'wrap'}}>
+                {[['4.9','average rating'],['1,200+','fittings booked'],['Dar es Salaam','by appointment']].map(function(it){return(
+                  <div key={it[1]} style={{textAlign:'center'}}>
+                    <div style={{fontFamily:PP,fontSize:26,fontWeight:600,color:'#F6F2EA',textShadow:'0 0 16px '+T.cyan+'44'}}>{it[0]}</div>
+                    <div style={{fontFamily:PP,fontSize:11,fontWeight:300,letterSpacing:2,textTransform:'uppercase',color:'#B8B3A8',marginTop:4}}>{it[1]}</div>
+                  </div>
+                );})}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {/* FOOTER — scroll-driven canvas (inline) */}
+      <section ref={footerSec} style={{position:'relative',minHeight:760,overflow:'hidden',background:T.void}}>
+        <canvas ref={footerC1} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        <canvas ref={footerC2} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)'}}/>
+        <div style={{position:'relative',minHeight:760,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'70px 70px 44px'}}>
+          <div style={{maxWidth:720}}>
+            <div style={{fontFamily:PP,fontSize:12,fontWeight:400,letterSpacing:5,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'88',marginBottom:20}}>The floor is open</div>
+            <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:60,lineHeight:1.08,letterSpacing:-1,color:'#F6F2EA',textShadow:'0 2px 22px rgba(0,0,0,.55)'}}>Your pair is<br/>waiting under<br/>the chandelier.</h2>
+            <div style={{display:'flex',gap:14,marginTop:36,flexWrap:'wrap'}}>
+              <a href="https://wa.me/255791696849?text=Hello%20Marisa%20Shoes%2C%20I'd%20like%20to%20place%20an%20order." target="_blank" rel="noreferrer" style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:10,fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:'#080810',padding:'17px 40px',borderRadius:999,background:'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 52%,'+T.cyan+')',boxShadow:'0 0 28px '+T.cobalt+'66,0 0 16px '+T.pink+'55'}}>Order Now</a>
+              <a href="https://wa.me/255791696849?text=Hello%20Marisa%20Shoes%2C%20I'd%20like%20to%20book%20a%20fitting." target="_blank" rel="noreferrer" style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:10,fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:'#F6F2EA',padding:'17px 36px',borderRadius:999,background:'rgba(10,12,22,.4)',border:'1.5px solid '+T.cyan,backdropFilter:'blur(8px)',boxShadow:'0 0 18px '+T.cyan+'33'}}>Book a Fitting</a>
+            </div>
+          </div>
+          <div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:18,marginBottom:34}}>
+              {[{lbl:'Visit',col:T.pink,main:'Oyster Bay',sub:'Dar es Salaam, Tanzania',href:'https://maps.google.com/?q=Oyster+Bay+Dar+es+Salaam',cta:'Open in Maps',icon:'M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z'},
+                {lbl:'WhatsApp',col:T.cyan,main:'+255 791 696 849',sub:'Chat & order, 9am–9pm',href:'https://wa.me/255791696849',cta:'Message us',icon:'M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.2-.2-1.2-1.5-1.2-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.3.1.6-.1 1.1z'},
+                {lbl:'Email',col:T.cobalt,main:'store@marisashoes.com',sub:'Wholesale & press',href:'mailto:store@marisashoes.com',cta:'Write to us',icon:'M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7L4 7v1l8 5 8-5V7l-8 5z'}
+              ].map(function(c){return(
+                <a key={c.lbl} href={c.href} target="_blank" rel="noreferrer" style={{textDecoration:'none',borderRadius:18,padding:'22px 24px',background:'rgba(12,13,20,.46)',border:'1.5px solid '+c.col,backdropFilter:'blur(14px) saturate(140%)',boxShadow:'inset 0 0 0 1px rgba(255,255,255,.06),0 0 22px '+c.col+'33',display:'flex',alignItems:'center',gap:18}}>
+                  <span style={{width:50,height:50,flexShrink:0,borderRadius:14,display:'inline-flex',alignItems:'center',justifyContent:'center',background:'rgba(8,8,11,.55)',border:'1.5px solid '+c.col,boxShadow:'0 0 14px '+c.col+'55'}}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill={c.col} style={{filter:'drop-shadow(0 0 5px '+c.col+')'}}><path d={c.icon}/></svg>
+                  </span>
+                  <div style={{minWidth:0}}>
+                    <div style={{fontFamily:PP,fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:c.col}}>{c.lbl}</div>
+                    <div style={{fontFamily:PP,fontSize:16,fontWeight:600,color:'#F6F2EA',marginTop:4,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{c.main}</div>
+                    <div style={{fontFamily:PP,fontSize:11.5,fontWeight:300,color:'#B8B3A8',marginTop:2}}>{c.sub}</div>
+                    <div style={{fontFamily:PP,fontSize:10.5,fontWeight:500,letterSpacing:1,color:c.col,marginTop:8}}>{c.cta} →</div>
+                  </div>
+                </a>
+              );})}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:16,paddingTop:22,borderTop:'1px solid rgba(255,255,255,.12)'}}>
+              <NeonWord size={20}/>
+              <span style={{fontFamily:PP,fontSize:11,fontWeight:300,letterSpacing:1,color:'#8C887F'}}>© 2026 Marisa Shoes · Feel electric, feel the power · Dar es Salaam</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+var root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<HeroMarbleNeon/>);
+</script>
+</body>
 </html>
