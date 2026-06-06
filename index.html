@@ -96,11 +96,11 @@ function NeonWord(props){
 }
 
 function CanvasScrubber(props){
-  var frames=props.frames,wrapperHeight=props.wrapperHeight||'300vh',sectionHeight=props.sectionHeight||'720px',gradient=props.gradient,children=props.children;
-  var wrapRef=React.useRef(null),c1Ref=React.useRef(null),c2Ref=React.useRef(null),aliveRef=React.useRef(true);
+  var frames=props.frames,wrapperHeight=props.wrapperHeight||'300vh',sectionHeight=props.sectionHeight||'100vh',gradient=props.gradient,children=props.children;
+  var wrapRef=React.useRef(null),innerRef=React.useRef(null),c1Ref=React.useRef(null),c2Ref=React.useRef(null),aliveRef=React.useRef(true);
   React.useEffect(function(){
-    var c1=c1Ref.current,c2=c2Ref.current;
-    if(!c1||!c2)return;
+    var c1=c1Ref.current,c2=c2Ref.current,inner=innerRef.current;
+    if(!c1||!c2||!inner)return;
     var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
     aliveRef.current=true;
     var cf=0,tf=0;
@@ -112,17 +112,27 @@ function CanvasScrubber(props){
     }
     function raf(){
       if(!aliveRef.current)return;
+      var wrap=wrapRef.current;
+      if(wrap&&inner){
+        var rect=wrap.getBoundingClientRect(),wH=window.innerHeight;
+        if(rect.top<=0&&rect.bottom>=wH){
+          inner.style.position='fixed';inner.style.top='0';inner.style.bottom='auto';
+          inner.style.left=rect.left+'px';inner.style.width=wrap.offsetWidth+'px';
+        } else if(rect.bottom>0&&rect.bottom<wH){
+          inner.style.position='absolute';inner.style.top='auto';inner.style.bottom='0';
+          inner.style.left='0';inner.style.width='100%';
+        } else {
+          inner.style.position='absolute';inner.style.top='0';inner.style.bottom='auto';
+          inner.style.left='0';inner.style.width='100%';
+        }
+      }
       var p=getProgress();
       tf=p*(frames.length-1);cf+=(tf-cf)*0.18;
       var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1);
       var mix=cf-Math.floor(cf);
-      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){
-        ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);
-      }
+      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);}
       ctx2.clearRect(0,0,c2.width,c2.height);
-      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){
-        ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;
-      }
+      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;}
       var sc=(1+p*0.09).toFixed(4);
       c1.style.transform='scale('+sc+')';c2.style.transform='scale('+sc+')';
       requestAnimationFrame(raf);
@@ -132,7 +142,7 @@ function CanvasScrubber(props){
   },[frames]);
   return(
     <div ref={wrapRef} style={{position:'relative',height:wrapperHeight}}>
-      <div style={{position:'sticky',top:0,height:sectionHeight,overflow:'hidden',background:T.void}}>
+      <div ref={innerRef} style={{position:'absolute',top:0,left:0,width:'100%',height:sectionHeight,overflow:'hidden',background:T.void}}>
         <canvas ref={c1Ref} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
         <canvas ref={c2Ref} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
         {gradient&&<div style={{position:'absolute',inset:0,background:gradient,pointerEvents:'none'}}/>}
@@ -448,7 +458,7 @@ function HeroMarbleNeon(){
     var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
     footerAlive.current=true;
     var frames=footerImgs,cf=0,tf=0;
-    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height*0.55)));}
+    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height)));}
     function raf(){
       if(!footerAlive.current)return;
       var p=getProgress();tf=p*(frames.length-1);cf+=(tf-cf)*0.18;
