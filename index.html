@@ -20,6 +20,41 @@
     @keyframes msdPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,0)}50%{box-shadow:0 0 22px 4px rgba(0,229,255,.25)}}
     @keyframes msdSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
     @keyframes msdSpinRev{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+
+    /* ── Responsive ── */
+    .msd-page{width:100%;overflow-x:hidden}
+    .msd-hero{height:clamp(480px,100vh,900px)!important}
+    .msd-header{padding:0 clamp(14px,3.5vw,46px)!important;height:clamp(58px,7vw,84px)!important}
+    .msd-hero-copy{left:clamp(16px,3.5vw,50px)!important;bottom:clamp(48px,6vw,84px)!important;max-width:min(1000px,94vw)!important}
+    .msd-hero-h1{font-size:clamp(20px,3.8vw,44px)!important;white-space:normal!important}
+    .msd-section-pad{padding:clamp(44px,6vw,96px) clamp(16px,4.5vw,70px) clamp(52px,7vw,104px)!important}
+    .msd-about-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(24px,4.5vw,64px);align-items:center}
+    .msd-about-h2{font-size:clamp(26px,3.8vw,50px)!important}
+    .msd-about-p{font-size:clamp(15px,1.5vw,19px)!important}
+    .msd-feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.2vw,16px)}
+    .msd-interior{height:clamp(220px,38vw,600px)!important}
+    .msd-catalog-pad{padding:clamp(44px,6vw,90px) clamp(16px,4.5vw,70px) clamp(52px,7vw,100px)!important}
+    .msd-test-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(16px,2vw,30px);align-items:center}
+    .msd-footer-pad{padding:clamp(32px,5vw,70px) clamp(16px,4.5vw,70px) clamp(22px,3vw,44px)!important}
+    .msd-footer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.2vw,18px)}
+    .msd-footer-h2{font-size:clamp(32px,5vw,60px)!important}
+    .msd-tour-label{font-size:clamp(36px,7vw,72px)!important}
+    .msd-tour-caret{height:clamp(32px,5.5vw,64px)!important}
+    .msd-nav{gap:clamp(12px,2vw,28px)!important}
+    .msd-nav span{font-size:clamp(9px,1vw,11px)!important}
+    .msd-header-links span{font-size:clamp(9px,1vw,11px)!important}
+    @media(max-width:900px){
+      .msd-about-grid{grid-template-columns:1fr!important}
+      .msd-feat-grid{grid-template-columns:repeat(3,1fr)}
+      .msd-test-grid{grid-template-columns:1fr!important}
+      .msd-footer-grid{grid-template-columns:1fr!important}
+    }
+    @media(max-width:620px){
+      .msd-feat-grid{grid-template-columns:1fr!important}
+      .msd-hero-nav{display:none!important}
+      .msd-hero-links{display:none!important}
+      .msd-catalog-filter-bar{flex-wrap:wrap!important;gap:8px!important}
+    }
   </style>
 </head>
 <body>
@@ -33,7 +68,7 @@
 var T={pink:'#FF3CAC',cobalt:'#2979FF',cyan:'#00E5FF',ink:'#1C1916',void:'#05060C'};
 var FB="'Poppins',sans-serif";
 var IMG='./img/';
-var TOUR_N=234,FOOTER_N=181;
+var TOUR_N=234,FOOTER_N=304;
 function pad4(n){return String(n).padStart(4,'0');}
 function preloadFrames(n,folder){
   return Array.from({length:n},function(_,i){
@@ -78,13 +113,11 @@ function CanvasScrubber(props){
     function raf(){
       if(!aliveRef.current)return;
       var p=getProgress();
-      tf=p*(frames.length-1);cf+=(tf-cf)*0.13;
+      tf=p*(frames.length-1);cf+=(tf-cf)*0.18;
       var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1);
-      var mix=cf-Math.floor(cf),bl=Math.min(Math.abs(tf-cf)*0.38,3.8);
+      var mix=cf-Math.floor(cf);
       if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){
-        ctx1.filter=bl>0.6?'blur('+bl.toFixed(1)+'px)':'none';
         ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);
-        ctx1.filter='none';
       }
       ctx2.clearRect(0,0,c2.width,c2.height);
       if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){
@@ -123,12 +156,12 @@ function TypeTour(){
   },[n,dir]);
   return(
     <div style={{display:'inline-flex',alignItems:'baseline'}}>
-      <span style={{fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:72,letterSpacing:1,textTransform:'lowercase',whiteSpace:'pre',
+      <span className="msd-tour-label" style={{fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:72,letterSpacing:1,textTransform:'lowercase',whiteSpace:'pre',
         color:'#FF3CAC',WebkitTextStroke:'1.3px #2979FF',paintOrder:'stroke fill',
         textShadow:'0 0 16px rgba(255,60,172,.6),0 0 32px rgba(41,121,255,.5),0 0 64px rgba(0,229,255,.3)'}}>
         {full.slice(0,n)}
       </span>
-      <span style={{display:'inline-block',width:5,height:64,marginLeft:6,background:'#00E5FF',
+      <span className="msd-tour-caret" style={{display:'inline-block',width:5,height:64,marginLeft:6,background:'#00E5FF',
         boxShadow:'0 0 14px #00E5FF,0 0 26px #00E5FF88',animation:'msdCaret 0.85s step-end infinite'}}/>
     </div>
   );
@@ -150,7 +183,7 @@ function Testimonials(){
   var as=React.useState(0);var active=as[0];var setActive=as[1];
   var p=PEOPLE[active];
   return(
-    <div style={{position:'relative',minHeight:560,display:'grid',gridTemplateColumns:'1fr 1.15fr',gap:30,alignItems:'center'}}>
+    <div className="msd-test-grid" style={{position:'relative',minHeight:560,display:'grid',gridTemplateColumns:'1fr 1.15fr',gap:30,alignItems:'center'}}>
       <div style={{position:'relative',height:560}}>
         <div style={{position:'absolute',left:'50%',top:'50%',width:8,height:8,borderRadius:999,transform:'translate(-50%,-50%)',background:T.cyan,boxShadow:'0 0 14px '+T.cyan+',0 0 32px '+T.cyan+'99'}}/>
         <div style={{position:'absolute',inset:0,animation:'msdSpin 64s linear infinite'}}>
@@ -302,7 +335,7 @@ function Catalog(props){
   function soldOut(name,sz){var seed=name.length+name.charCodeAt(name.length-1);return(seed+sz)%5===0;}
   return(
     <section style={{position:'relative',overflow:'hidden',background:seamless?'transparent':'#0B0A0C',padding:seamless?'90px 70px 56px':'90px 70px 100px'}}>
-      {!seamless&&<div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>}
+      {!seamless&&<div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover no-repeat'}}/>}
       {!seamless&&<div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.36))'}}/>}
       <div style={{position:'relative'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:30}}>
@@ -408,48 +441,27 @@ function HeroMarbleNeon(){
   var PP="'Poppins',sans-serif";
   var nav=['NEW IN','HEELS','BOOTS','THE COSPLAY EDIT','STORES'];
   var neonLine='linear-gradient(90deg,'+T.pink+','+T.cobalt+','+T.cyan+')';
-  var footerSec=React.useRef(null),footerC1=React.useRef(null),footerC2=React.useRef(null),footerAlive=React.useRef(true);
-  React.useEffect(function(){
-    var c1=footerC1.current,c2=footerC2.current,sec=footerSec.current;
-    if(!c1||!c2||!sec)return;
-    var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
-    footerAlive.current=true;
-    var frames=footerImgs,cf=0,tf=0;
-    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height*0.55)));}
-    function raf(){
-      if(!footerAlive.current)return;
-      var p=getProgress();tf=p*(frames.length-1);cf+=(tf-cf)*0.13;
-      var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1),mix=cf-Math.floor(cf),bl=Math.min(Math.abs(tf-cf)*0.38,3.8);
-      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){ctx1.filter=bl>0.6?'blur('+bl.toFixed(1)+'px)':'none';ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);ctx1.filter='none';}
-      ctx2.clearRect(0,0,c2.width,c2.height);
-      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;}
-      var sc=(1+p*0.09).toFixed(4);c1.style.transform='scale('+sc+')';c2.style.transform='scale('+sc+')';
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-    return function(){footerAlive.current=false;};
-  },[]);
 
   return(
-    <div style={{width:1440,fontFamily:FB,background:'#F3EFE6 url('+IMG+'marble_bg.png) center/cover',color:T.ink}}>
+    <div className="msd-page" style={{fontFamily:FB,background:'#F3EFE6',color:T.ink}}>
 
       {/* HERO */}
-      <div style={{position:'relative',height:900,overflow:'hidden',background:T.void}}>
+      <div className="msd-hero" style={{position:'relative',overflow:'hidden',background:T.void}}>
         <video src="uploads/202606052138.mp4" autoPlay muted loop playsInline style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,7,16,.34) 0%,transparent 22%,transparent 55%,rgba(5,7,16,.55) 100%)'}}/>
-        <header style={{position:'absolute',top:0,left:0,right:0,height:84,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 46px',background:'linear-gradient(180deg,rgba(10,13,26,.30),rgba(10,13,26,.06))',backdropFilter:'blur(13px) saturate(150%)',WebkitBackdropFilter:'blur(13px) saturate(150%)',borderBottom:'1px solid transparent',borderImage:neonLine+' 1',boxShadow:'inset 0 -1px 16px rgba(0,229,255,.10)'}}>
-          <nav style={{display:'flex',gap:28}}>
+        <header className="msd-header" style={{position:'absolute',top:0,left:0,right:0,display:'flex',alignItems:'center',justifyContent:'space-between',background:'linear-gradient(180deg,rgba(10,13,26,.30),rgba(10,13,26,.06))',backdropFilter:'blur(13px) saturate(150%)',WebkitBackdropFilter:'blur(13px) saturate(150%)',borderBottom:'1px solid transparent',borderImage:neonLine+' 1',boxShadow:'inset 0 -1px 16px rgba(0,229,255,.10)'}}>
+          <nav className="msd-nav msd-hero-nav" style={{display:'flex',gap:28}}>
             {nav.map(function(n){return(<span key={n} style={{fontFamily:FB,fontSize:11,fontWeight:300,letterSpacing:2.5,textTransform:'uppercase',color:n==='THE COSPLAY EDIT'?T.pink:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)',cursor:'pointer'}}>{n}</span>);})}
           </nav>
           <NeonWord size={19}/>
-          <div style={{display:'flex',gap:22,alignItems:'center',fontFamily:FB,fontSize:11,letterSpacing:2,color:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)'}}>
+          <div className="msd-header-links msd-hero-links" style={{display:'flex',gap:22,alignItems:'center',fontFamily:FB,fontSize:11,letterSpacing:2,color:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)'}}>
             <span style={{cursor:'pointer'}}>SEARCH</span><span style={{cursor:'pointer'}}>ACCOUNT</span>
             <span style={{color:T.cyan,textShadow:'0 0 10px '+T.cyan+'99',cursor:'pointer'}}>BAG ⟨0⟩</span>
           </div>
         </header>
-        <div style={{position:'absolute',left:50,bottom:84,maxWidth:1000}}>
+        <div className="msd-hero-copy" style={{position:'absolute',left:50,bottom:84,maxWidth:1000}}>
           <div style={{fontFamily:FB,fontSize:11,fontWeight:400,letterSpacing:5,textTransform:'uppercase',color:T.cyan,marginBottom:20,textShadow:'0 0 12px '+T.cyan+'88'}}>Night Shift · Collection 01</div>
-          <h1 style={{margin:0,fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:44,lineHeight:1.1,letterSpacing:0.5,whiteSpace:'nowrap',textTransform:'lowercase',color:T.pink,WebkitTextStroke:'1.1px '+T.cobalt,paintOrder:'stroke fill',textShadow:'0 0 14px rgba(255,60,172,.6),0 0 28px rgba(41,121,255,.5),0 0 52px rgba(0,229,255,.3)',animation:'msdFlick 6s infinite'}}>
+          <h1 className="msd-hero-h1" style={{margin:0,fontFamily:"'Poppins',sans-serif",fontWeight:600,fontSize:44,lineHeight:1.1,letterSpacing:0.5,textTransform:'lowercase',color:T.pink,WebkitTextStroke:'1.1px '+T.cobalt,paintOrder:'stroke fill',textShadow:'0 0 14px rgba(255,60,172,.6),0 0 28px rgba(41,121,255,.5),0 0 52px rgba(0,229,255,.3)',animation:'msdFlick 6s infinite'}}>
             feel electric, feel the power
           </h1>
         </div>
@@ -462,19 +474,19 @@ function HeroMarbleNeon(){
       </div>
 
       {/* ABOUT */}
-      <section style={{padding:'96px 70px 104px',position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
+      <section className="msd-section-pad" style={{padding:'96px 70px 104px',position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
         <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.34),rgba(8,7,10,.22))'}}/>
-        <div style={{position:'relative',display:'grid',gridTemplateColumns:'1fr 1.05fr',gap:64,alignItems:'center'}}>
+        <div className="msd-about-grid" style={{position:'relative',display:'grid',gridTemplateColumns:'1fr 1.05fr',gap:64,alignItems:'center'}}>
           <div>
             <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:24}}>
               <span style={{width:34,height:2,background:'linear-gradient(90deg,'+T.pink+','+T.cyan+')',boxShadow:'0 0 8px '+T.cyan+'88'}}/>
               <span style={{fontFamily:PP,fontSize:13,fontWeight:500,letterSpacing:4,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'66'}}>The House of Marisa</span>
             </div>
-            <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:50,lineHeight:1.16,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>A house built for the woman who arrives.</h2>
-            <p style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'30px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>Marisa Shoes exists for the high-class creative woman — the one who designs whole worlds in her head and then walks out the door wearing one. Our purpose is simple: to make her feel electric the moment she steps onto the floor.</p>
-            <p style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'22px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>In our Oyster Bay atelier in Dar es Salaam, marble calm meets neon current. We exist to dress the character you are becoming, one client at a time, under the chandelier.</p>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginTop:44}}>
+            <h2 className="msd-about-h2" style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:50,lineHeight:1.16,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>A house built for the woman who arrives.</h2>
+            <p className="msd-about-p" style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'30px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>Marisa Shoes exists for the high-class creative woman — the one who designs whole worlds in her head and then walks out the door wearing one. Our purpose is simple: to make her feel electric the moment she steps onto the floor.</p>
+            <p className="msd-about-p" style={{fontFamily:PP,fontWeight:300,fontSize:19,lineHeight:1.9,color:'#ECE7DD',margin:'22px 0 0',maxWidth:560,textShadow:'0 1px 10px rgba(0,0,0,.4)'}}>In our Oyster Bay atelier in Dar es Salaam, marble calm meets neon current. We exist to dress the character you are becoming, one client at a time, under the chandelier.</p>
+            <div className="msd-feat-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginTop:44}}>
               {[['01','Craft','Every pair chosen, never mass-stocked.',T.pink],['02','Power','Heels engineered to command a room.',T.cobalt],['03','Ritual','A private floor, champagne, your stylist.',T.cyan]].map(function(it){return(
                 <div key={it[0]} style={{borderRadius:16,padding:'20px 18px 22px',background:'rgba(18,18,24,.34)',border:'1.5px solid '+it[3],boxShadow:'inset 0 0 0 1px rgba(255,255,255,.08),0 0 18px '+it[3]+'40',backdropFilter:'blur(10px) saturate(140%)',WebkitBackdropFilter:'blur(10px) saturate(140%)'}}>
                   <div style={{fontFamily:PP,fontSize:12,fontWeight:600,letterSpacing:2,color:it[3],textShadow:'0 0 10px '+it[3]+'88'}}>{it[0]}</div>
@@ -489,7 +501,7 @@ function HeroMarbleNeon(){
           </div>
           <figure style={{margin:0,position:'relative'}}>
             <div style={{borderRadius:22,overflow:'hidden',position:'relative',border:'2px solid '+T.cyan,boxShadow:'0 0 0 1px rgba(255,255,255,.18),0 0 30px '+T.cyan+'4A,0 26px 60px rgba(0,0,0,.5)'}}>
-              <img src={IMG+'interior_wide.png'} alt="Inside the Marisa store" style={{display:'block',width:'100%',height:600,objectFit:'cover'}}/>
+              <img src={IMG+'interior_wide.png'} alt="Inside the Marisa store" className="msd-interior" style={{display:'block',width:'100%',height:600,objectFit:'cover'}}/>
               <div style={{position:'absolute',inset:0,pointerEvents:'none',boxShadow:'inset 0 0 60px '+T.cobalt+'1F'}}/>
             </div>
             <figcaption style={{position:'absolute',left:18,bottom:18,borderRadius:999,padding:'10px 20px',background:'rgba(10,13,26,.45)',backdropFilter:'blur(10px)',border:'1px solid '+T.pink,boxShadow:'0 0 16px '+T.pink+'55',fontFamily:PP,fontSize:12,fontWeight:400,letterSpacing:2,textTransform:'uppercase',color:'#F4F0FF'}}>Oyster Bay · Dar es Salaam</figcaption>
@@ -506,7 +518,7 @@ function HeroMarbleNeon(){
 
       {/* CATALOG + TESTIMONIALS */}
       <div style={{position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
-        <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>
+        <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover no-repeat'}}/>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.46))'}}/>
         <div style={{position:'relative'}}>
           <Catalog seamless={true}/>
@@ -534,22 +546,19 @@ function HeroMarbleNeon(){
         </div>
       </div>
 
-      {/* FOOTER — scroll-driven canvas (inline) */}
-      <section ref={footerSec} style={{position:'relative',minHeight:760,overflow:'hidden',background:T.void}}>
-        <canvas ref={footerC1} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
-        <canvas ref={footerC2} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)'}}/>
-        <div style={{position:'relative',minHeight:760,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'70px 70px 44px'}}>
+      {/* FOOTER — sticky scroll-driven canvas scrubber */}
+      <CanvasScrubber frames={footerImgs} wrapperHeight="240vh" sectionHeight="clamp(480px,80vh,760px)" gradient="linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)">
+        <div className="msd-footer-pad" style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'70px 70px 44px'}}>
           <div style={{maxWidth:720}}>
             <div style={{fontFamily:PP,fontSize:12,fontWeight:400,letterSpacing:5,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'88',marginBottom:20}}>The floor is open</div>
-            <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:60,lineHeight:1.08,letterSpacing:-1,color:'#F6F2EA',textShadow:'0 2px 22px rgba(0,0,0,.55)'}}>Your pair is<br/>waiting under<br/>the chandelier.</h2>
+            <h2 className="msd-footer-h2" style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:60,lineHeight:1.08,letterSpacing:-1,color:'#F6F2EA',textShadow:'0 2px 22px rgba(0,0,0,.55)'}}>Your pair is<br/>waiting under<br/>the chandelier.</h2>
             <div style={{display:'flex',gap:14,marginTop:36,flexWrap:'wrap'}}>
               <a href="https://wa.me/255791696849?text=Hello%20Marisa%20Shoes%2C%20I'd%20like%20to%20place%20an%20order." target="_blank" rel="noreferrer" style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:10,fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:'#080810',padding:'17px 40px',borderRadius:999,background:'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 52%,'+T.cyan+')',boxShadow:'0 0 28px '+T.cobalt+'66,0 0 16px '+T.pink+'55'}}>Order Now</a>
               <a href="https://wa.me/255791696849?text=Hello%20Marisa%20Shoes%2C%20I'd%20like%20to%20book%20a%20fitting." target="_blank" rel="noreferrer" style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:10,fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:'#F6F2EA',padding:'17px 36px',borderRadius:999,background:'rgba(10,12,22,.4)',border:'1.5px solid '+T.cyan,backdropFilter:'blur(8px)',boxShadow:'0 0 18px '+T.cyan+'33'}}>Book a Fitting</a>
             </div>
           </div>
           <div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:18,marginBottom:34}}>
+            <div className="msd-footer-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:18,marginBottom:34}}>
               {[{lbl:'Visit',col:T.pink,main:'Oyster Bay',sub:'Dar es Salaam, Tanzania',href:'https://maps.google.com/?q=Oyster+Bay+Dar+es+Salaam',cta:'Open in Maps',icon:'M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z'},
                 {lbl:'WhatsApp',col:T.cyan,main:'+255 791 696 849',sub:'Chat & order, 9am–9pm',href:'https://wa.me/255791696849',cta:'Message us',icon:'M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.2-.2-1.2-1.5-1.2-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.3.1.6-.1 1.1z'},
                 {lbl:'Email',col:T.cobalt,main:'store@marisashoes.com',sub:'Wholesale & press',href:'mailto:store@marisashoes.com',cta:'Write to us',icon:'M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7L4 7v1l8 5 8-5V7l-8 5z'}
@@ -573,7 +582,7 @@ function HeroMarbleNeon(){
             </div>
           </div>
         </div>
-      </section>
+      </CanvasScrubber>
     </div>
   );
 }
