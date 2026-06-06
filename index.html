@@ -458,7 +458,7 @@ function HeroMarbleNeon(){
     var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
     footerAlive.current=true;
     var frames=footerImgs,cf=0,tf=0;
-    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height)));}
+    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/rect.height));}
     function raf(){
       if(!footerAlive.current)return;
       var p=getProgress();tf=p*(frames.length-1);cf+=(tf-cf)*0.18;
