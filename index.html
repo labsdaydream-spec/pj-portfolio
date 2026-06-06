@@ -326,25 +326,149 @@ function Catalog(props){
   var PP="'Poppins',sans-serif";
   var NEON=[T.pink,T.cobalt,T.cyan];
   var filtLabel={fontFamily:PP,fontSize:11,fontWeight:600,letterSpacing:2.5,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 10px '+T.cyan+'55'};
-  function Drop(dp){var children=dp.children,accent=dp.accent||T.cyan;return(<span style={{display:'inline-flex',alignItems:'center',gap:12,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+accent+'88',backdropFilter:'blur(8px)',boxShadow:'0 0 12px '+accent+'22',fontFamily:PP,fontSize:12.5,fontWeight:400,color:'#F1ECE2',letterSpacing:.5}}>{children}<span style={{color:accent,fontSize:10}}>▾</span></span>);}
-  function Chip(cp){var children=cp.children,active=cp.active;return(<span style={{borderRadius:999,padding:'8px 16px',fontFamily:PP,fontSize:12,fontWeight:active?600:400,letterSpacing:.8,color:active?'#080810':'#E7E2D8',background:active?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')'  :'rgba(16,16,22,.4)',border:active?'1px solid transparent':'1px solid rgba(0,229,255,.4)',backdropFilter:'blur(8px)',boxShadow:active?'0 0 18px '+T.cobalt+'55':'none'}}>{children}</span>);}
-  function Toggle(tp){return(<span style={{display:'inline-flex',borderRadius:999,overflow:'hidden',border:'1px solid rgba(0,229,255,.4)',fontFamily:PP,fontSize:11.5,letterSpacing:.5}}><span style={{padding:'8px 15px',color:'#080810',fontWeight:600,background:'linear-gradient(95deg,'+T.cobalt+','+T.cyan+')'}}>{tp.on}</span><span style={{padding:'8px 15px',color:'#CFCABF',background:'rgba(16,16,22,.4)'}}>{tp.off}</span></span>);}
-  var PAGESRAW=[
-    [['s17','SERPENTINE','crystal snake-wrap stiletto','antique gold','1,950,000'],['s21','SAPPHIRE','crystal mesh bootie','midnight blue','1,780,000'],['s29','EMERALD','jewelled velvet bootie','emerald','1,820,000'],['s24','SCARLET','glossy patent pump','lacquer red','850,000'],['s18','CASCADE','crystal chain leg sandal','silver','1,690,000'],['s05','ROUGE ROSE','rose-bloom platform heel','crimson','1,240,000'],['s13','LAGOON','crystal knit sandal','teal','1,450,000'],['s27','MIDAS','metallic pointed pump','liquid gold','980,000'],['s10','AMORE','pearl heart tall boot','ivory','2,000,000'],['s02','CLEOPATRA','beaded cage boot','pharaoh gold','1,880,000'],['s12','NOIR ROSE','rose-lace bootie','burgundy','1,320,000'],['s19','HALO','strappy ankle sandal','liquid gold','720,000']],
-    [['n01','MANIFESTO','shirt-collar stiletto bootie','white & magenta','1,180,000'],['n02','BAROQUE','filigree patent pump','oxblood','1,560,000'],['n03','ASH','metal-heel suede pump','dove grey','760,000'],['n04','BLUSH PEARL','pearl-cuff pump','rose','820,000'],['n05','BORDEAUX','pearl-cuff pump','wine','840,000'],['n06','ROUGE BOW','satin bow pump','burgundy','880,000'],['n07','VELOUR','buckle block heel','burgundy','790,000'],['n08','DOVE BOW','satin bow pump','silver','810,000'],['n09','LACE CAGE','lace-up cutout bootie','nude','950,000'],['n10','GLADIATRIX','studded cage boot','nude','1,290,000'],['n11','SNOWWEB','crochet net bootie','ivory','1,050,000'],['n12','TALISMAN','studded mandala sandal','jet','1,140,000']],
-    [['n13','VANGUARD','studded gold-heel boot','black & gold','1,620,000'],['n14','GILDED ZIP','gold-zip ankle bootie','jet black','980,000'],['n15','PYTHON','snake-heel ankle bootie','jet black','1,020,000'],['n16','ZEBRA','crystal zebra pump','monochrome','1,210,000'],['n17','STARDUST','glitter cutout lace-up pump','black & silver','1,160,000'],['n18','COMET','diamanté swirl pump','jet black','1,090,000'],['n19','VIPER','snake lace-up pump','python','1,070,000'],['n20','LEOPARD BOW','glitter leopard bow pump','leopard','990,000'],['n21','POLKA','polka-dot bow pump','monochrome','880,000'],['n22','DOTTED','mesh polka bow heel','monochrome','860,000'],['n23','POLKA SHEER','sheer polka sling','monochrome','900,000'],['n24','GOLD ZEBRA',"crystal d'orsay pump",'black & gold','1,340,000']],
-    [['n25','ATHENA','strappy caged heel','white','1,010,000'],['n26','PETAL','floral appliqué bootie','nude','1,520,000'],['n27','RUBY BOW','satin bow ankle pump','crimson','870,000'],['n28','SCARLET BOW','suede bow pump','red','830,000'],['n29','MIDNIGHT LEAF','leaf-heel satin pump','sapphire','1,720,000'],['n30','LOVESTRUCK','heart-toe patent stiletto','black & gold','1,260,000'],['s03','ROUGE CRYSTAL','embellished sheer bootie','crimson','1,480,000'],['s04','DECO BOW','bow pump w/ gold cuff','jet','940,000'],['s06','RUCHE','ruched lace-up bootie','burgundy','1,150,000'],['s07','VELVET LACE','velvet lace-up boot','burgundy','1,390,000'],['s08','BLUSH LACE','sheer lace boot','blush','1,280,000'],['s09','IVORY LACE','lace tall boot w/ bow','ivory','1,330,000']],
+
+  var ALL=[
+    ['s17','SERPENTINE','crystal snake-wrap stiletto','antique gold','1,950,000'],
+    ['s21','SAPPHIRE','crystal mesh bootie','midnight blue','1,780,000'],
+    ['s29','EMERALD','jewelled velvet bootie','emerald','1,820,000'],
+    ['s24','SCARLET','glossy patent pump','lacquer red','850,000'],
+    ['s18','CASCADE','crystal chain leg sandal','silver','1,690,000'],
+    ['s05','ROUGE ROSE','rose-bloom platform heel','crimson','1,240,000'],
+    ['s13','LAGOON','crystal knit sandal','teal','1,450,000'],
+    ['s27','MIDAS','metallic pointed pump','liquid gold','980,000'],
+    ['s10','AMORE','pearl heart tall boot','ivory','2,000,000'],
+    ['s02','CLEOPATRA','beaded cage boot','pharaoh gold','1,880,000'],
+    ['s12','NOIR ROSE','rose-lace bootie','burgundy','1,320,000'],
+    ['s19','HALO','strappy ankle sandal','liquid gold','720,000'],
+    ['n01','MANIFESTO','shirt-collar stiletto bootie','white & magenta','1,180,000'],
+    ['n02','BAROQUE','filigree patent pump','oxblood','1,560,000'],
+    ['n03','ASH','metal-heel suede pump','dove grey','760,000'],
+    ['n04','BLUSH PEARL','pearl-cuff pump','rose','820,000'],
+    ['n05','BORDEAUX','pearl-cuff pump','wine','840,000'],
+    ['n06','ROUGE BOW','satin bow pump','burgundy','880,000'],
+    ['n07','VELOUR','buckle block heel','burgundy','790,000'],
+    ['n08','DOVE BOW','satin bow pump','silver','810,000'],
+    ['n09','LACE CAGE','lace-up cutout bootie','nude','950,000'],
+    ['n10','GLADIATRIX','studded cage boot','nude','1,290,000'],
+    ['n11','SNOWWEB','crochet net bootie','ivory','1,050,000'],
+    ['n12','TALISMAN','studded mandala sandal','jet','1,140,000'],
+    ['n13','VANGUARD','studded gold-heel boot','black & gold','1,620,000'],
+    ['n14','GILDED ZIP','gold-zip ankle bootie','jet black','980,000'],
+    ['n15','PYTHON','snake-heel ankle bootie','jet black','1,020,000'],
+    ['n16','ZEBRA','crystal zebra pump','monochrome','1,210,000'],
+    ['n17','STARDUST','glitter cutout lace-up pump','black & silver','1,160,000'],
+    ['n18','COMET','diamanté swirl pump','jet black','1,090,000'],
+    ['n19','VIPER','snake lace-up pump','python','1,070,000'],
+    ['n20','LEOPARD BOW','glitter leopard bow pump','leopard','990,000'],
+    ['n21','POLKA','polka-dot bow pump','monochrome','880,000'],
+    ['n22','DOTTED','mesh polka bow heel','monochrome','860,000'],
+    ['n23','POLKA SHEER','sheer polka sling','monochrome','900,000'],
+    ['n24','GOLD ZEBRA',"crystal d'orsay pump",'black & gold','1,340,000'],
+    ['n25','ATHENA','strappy caged heel','white','1,010,000'],
+    ['n26','PETAL','floral appliqué bootie','nude','1,520,000'],
+    ['n27','RUBY BOW','satin bow ankle pump','crimson','870,000'],
+    ['n28','SCARLET BOW','suede bow pump','red','830,000'],
+    ['n29','MIDNIGHT LEAF','leaf-heel satin pump','sapphire','1,720,000'],
+    ['n30','LOVESTRUCK','heart-toe patent stiletto','black & gold','1,260,000'],
+    ['s03','ROUGE CRYSTAL','embellished sheer bootie','crimson','1,480,000'],
+    ['s04','DECO BOW','bow pump w/ gold cuff','jet','940,000'],
+    ['s06','RUCHE','ruched lace-up bootie','burgundy','1,150,000'],
+    ['s07','VELVET LACE','velvet lace-up boot','burgundy','1,390,000'],
+    ['s08','BLUSH LACE','sheer lace boot','blush','1,280,000'],
+    ['s09','IVORY LACE','lace tall boot w/ bow','ivory','1,330,000'],
   ];
-  var PAGES=[PAGESRAW[1],PAGESRAW[2],PAGESRAW[0],PAGESRAW[3]];
-  var SIG=2,TOTAL=PAGES.reduce(function(a,p){return a+p.length;},0);
-  var ps=React.useState(0);var page=ps[0];var setPage=ps[1];
-  var items=PAGES[page];
+
+  var COLOR_GROUPS=[
+    {col:'#16161C',test:function(t){return /jet|noir|black|mono|python|leopard/.test(t);}},
+    {col:'#C7A98A',test:function(t){return /nude|dove|grey|gray|antique|pharaoh/.test(t);}},
+    {col:'#86202C',test:function(t){return /crimson|rouge|scarlet|burgundy|wine|oxblood|red/.test(t);}},
+    {col:'#C2A766',test:function(t){return /\bgold\b|gilded/.test(t);}},
+    {col:T.pink,test:function(t){return /pink|rose|blush|magenta/.test(t);}},
+    {col:T.cyan,test:function(t){return /teal|emerald|sapphire|midnight|blue/.test(t);}},
+    {col:T.cobalt,test:function(t){return /cobalt/.test(t);}},
+    {col:'#E9E4DA',test:function(t){return /silver|white|ivory|snow|pearl/.test(t);}},
+  ];
+
+  var tfs=React.useState('All');var typeFilter=tfs[0];var setTypeFilter=tfs[1];
+  var hfs=React.useState('With');var heelFilter=hfs[0];var setHeelFilter=hfs[1];
+  var cfs=React.useState(null);var colorFilter=cfs[0];var setColorFilter=cfs[1];
+  var sbs=React.useState('New Arrivals');var sortBy=sbs[0];var setSortBy=sbs[1];
+  var szs=React.useState(43);var sizeFilter=szs[0];var setSizeFilter=szs[1];
+  var pps=React.useState(12);var perPage=pps[0];var setPerPage=pps[1];
+  var pls=React.useState('All');var productLine=pls[0];var setProductLine=pls[1];
+  var pgs=React.useState(0);var page=pgs[0];var setPage=pgs[1];
   var sels=React.useState(null);var sel=sels[0];var setSel=sels[1];
+  var dPPs=React.useState(false);var dropPP=dPPs[0];var setDropPP=dPPs[1];
+  var dPLs=React.useState(false);var dropPL=dPLs[0];var setDropPL=dPLs[1];
   var WA='255791696849';
+
   function sizesFor(name){var all=[35,36,37,38,39,40,41,42,43],seed=name.length+name.charCodeAt(0);return all.filter(function(sz,k){return(seed+k*3)%7!==0;});}
   function soldOut(name,sz){var seed=name.length+name.charCodeAt(name.length-1);return(seed+sz)%5===0;}
+  function parsePrice(p){return parseInt(p.replace(/,/g,''),10);}
+  function getType(desc){
+    var d=desc.toLowerCase();
+    if(d.indexOf('stiletto')>=0)return 'Stiletto';
+    if(d.indexOf('platform')>=0)return 'Platform';
+    if(d.indexOf('sling')>=0)return 'Slingback';
+    if(d.indexOf('boot')>=0||d.indexOf('bootie')>=0)return 'Boot';
+    if(d.indexOf('sandal')>=0)return 'Sandal';
+    return 'Pump';
+  }
+  function getColorGroup(tone){
+    var t=tone.toLowerCase();
+    for(var i=0;i<COLOR_GROUPS.length;i++){if(COLOR_GROUPS[i].test(t))return COLOR_GROUPS[i].col;}
+    return '#C7A98A';
+  }
+
+  React.useEffect(function(){
+    window._marisaSetFilter=function(f){
+      if(f.type!==undefined)setTypeFilter(f.type);
+      if(f.heels!==undefined)setHeelFilter(f.heels);
+      if(f.sort!==undefined)setSortBy(f.sort);
+      if(f.line!==undefined)setProductLine(f.line);
+      setPage(0);
+    };
+    return function(){window._marisaSetFilter=null;};
+  },[]);
+
+  React.useEffect(function(){setPage(0);},[typeFilter,heelFilter,colorFilter,sortBy,sizeFilter,perPage,productLine]);
+
+  React.useEffect(function(){
+    function close(e){setDropPP(false);setDropPL(false);}
+    document.addEventListener('click',close);
+    return function(){document.removeEventListener('click',close);};
+  },[]);
+
+  function clearFilters(){setTypeFilter('All');setHeelFilter('With');setColorFilter(null);setSortBy('New Arrivals');setSizeFilter(43);setPerPage(12);setProductLine('All');setPage(0);}
+
+  var filtered=ALL.filter(function(it){
+    var file=it[0],name=it[1],desc=it[2],tone=it[3];
+    if(productLine==='Signature'&&file[0]!=='s')return false;
+    if(productLine==='Night Shift'&&file[0]!=='n')return false;
+    if(typeFilter!=='All'&&getType(desc)!==typeFilter)return false;
+    if(heelFilter==='Without'){var tp=getType(desc);if(tp!=='Boot'&&tp!=='Sandal')return false;}
+    if(colorFilter&&getColorGroup(tone)!==colorFilter)return false;
+    if(!sizesFor(name).some(function(sz){return sz===sizeFilter;}))return false;
+    return true;
+  });
+
+  var sorted=filtered.slice();
+  if(sortBy==='Price Low')sorted.sort(function(a,b){return parsePrice(a[4])-parsePrice(b[4]);});
+  else if(sortBy==='Price High')sorted.sort(function(a,b){return parsePrice(b[4])-parsePrice(a[4]);});
+  else if(sortBy==='Name')sorted.sort(function(a,b){return a[1]<b[1]?-1:a[1]>b[1]?1:0;});
+  else sorted.sort(function(a,b){var an=a[0][0]==='n'?0:1,bn=b[0][0]==='n'?0:1;return an-bn;});
+
+  var TOTAL=sorted.length,SIG=ALL.length;
+  var totalPages=Math.max(1,Math.ceil(TOTAL/perPage));
+  var safePg=Math.min(page,totalPages-1);
+  var items=sorted.slice(safePg*perPage,(safePg+1)*perPage);
+
+  var chipStyle=function(on){return {borderRadius:999,padding:'8px 16px',fontFamily:PP,fontSize:12,fontWeight:on?600:400,letterSpacing:.8,cursor:'pointer',userSelect:'none',color:on?'#080810':'#E7E2D8',background:on?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')':'rgba(16,16,22,.4)',border:on?'1px solid transparent':'1px solid rgba(0,229,255,.4)',backdropFilter:'blur(8px)',boxShadow:on?'0 0 18px '+T.cobalt+'55':'none',transition:'all .2s'};};
+  var dropStyle={position:'absolute',zIndex:500,borderRadius:10,overflow:'hidden',border:'1px solid '+T.cyan+'88',background:'rgba(8,8,12,.98)',backdropFilter:'blur(14px)',boxShadow:'0 0 24px '+T.cyan+'33'};
+  var dropItem=function(active){return {padding:'10px 18px',fontFamily:PP,fontSize:12.5,cursor:'pointer',color:active?T.cyan:'#E7E2D8',background:active?'rgba(0,229,255,.10)':'transparent'};};
+
   return(
-    <section style={{position:'relative',overflow:'hidden',background:seamless?'transparent':'#0B0A0C',padding:seamless?'90px 70px 56px':'90px 70px 100px'}}>
+    <section id="catalog" className="msd-catalog-pad" style={{position:'relative',background:seamless?'transparent':'#0B0A0C',padding:seamless?'90px 70px 56px':'90px 70px 100px'}}>
       {!seamless&&<div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover no-repeat'}}/>}
       {!seamless&&<div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.36))'}}/>}
       <div style={{position:'relative'}}>
@@ -356,56 +480,124 @@ function Catalog(props){
             </div>
             <h2 style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:46,lineHeight:1.12,letterSpacing:-.5,color:'#F6F2EA',textShadow:'0 2px 18px rgba(0,0,0,.5)'}}>Night Shift — every pair on the floor</h2>
           </div>
-          <span style={{fontFamily:PP,fontSize:13,fontWeight:300,color:'#CFCABF'}}>{TOTAL} styles</span>
+          <span style={{fontFamily:PP,fontSize:13,fontWeight:300,color:'#CFCABF'}}>{SIG} styles</span>
         </div>
-        <div style={{borderRadius:20,border:'1.5px solid '+T.cyan,overflow:'hidden',background:'rgba(12,12,17,.34)',backdropFilter:'blur(12px) saturate(140%)',boxShadow:'0 0 26px '+T.cyan+'33,inset 0 0 0 1px rgba(255,255,255,.06)',marginBottom:26}}>
-          <div style={{display:'flex',alignItems:'center',gap:36,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
+
+        {/* ── Filter panel ── */}
+        <div onClick={function(e){e.stopPropagation();}} style={{borderRadius:20,border:'1.5px solid '+T.cyan,background:'rgba(12,12,17,.34)',backdropFilter:'blur(12px) saturate(140%)',boxShadow:'0 0 26px '+T.cyan+'33,inset 0 0 0 1px rgba(255,255,255,.06)',marginBottom:26,position:'relative',zIndex:20}}>
+
+          {/* Row 1: Window · Product line · Size */}
+          <div style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
             <span style={filtLabel}>Window</span>
-            <div style={{display:'flex',gap:10}}><Drop>Sales</Drop><Drop accent={T.pink}>20%</Drop></div>
-            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
-            <span style={filtLabel}>Product line</span><Drop>All</Drop>
-            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
+            <div style={{display:'flex',gap:10}}>
+              <span style={{display:'inline-flex',alignItems:'center',gap:10,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+T.cyan+'88',fontFamily:PP,fontSize:12.5,color:'#F1ECE2',letterSpacing:.5}}>Sales</span>
+              <span style={{display:'inline-flex',alignItems:'center',gap:10,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+T.pink+'88',fontFamily:PP,fontSize:12.5,color:T.pink,letterSpacing:.5,fontWeight:600}}>20% off</span>
+            </div>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)',flexShrink:0}}/>
+            <span style={filtLabel}>Product line</span>
+            <div style={{position:'relative'}} onClick={function(e){e.stopPropagation();}}>
+              <span onClick={function(){setDropPL(function(v){return !v;});setDropPP(false);}} style={{display:'inline-flex',alignItems:'center',gap:10,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+T.cyan+'88',fontFamily:PP,fontSize:12.5,color:'#F1ECE2',letterSpacing:.5,cursor:'pointer',userSelect:'none'}}>
+                {productLine}<span style={{color:T.cyan,fontSize:10}}>▾</span>
+              </span>
+              {dropPL&&<div style={Object.assign({},dropStyle,{top:'calc(100% + 6px)',left:0,minWidth:140})}>
+                {['All','Night Shift','Signature'].map(function(opt){return(
+                  <div key={opt} onClick={function(){setProductLine(opt);setDropPL(false);}} style={dropItem(productLine===opt)}
+                    onMouseEnter={function(e){e.currentTarget.style.background='rgba(0,229,255,.14)';}}
+                    onMouseLeave={function(e){e.currentTarget.style.background=productLine===opt?'rgba(0,229,255,.10)':'transparent';}}
+                  >{opt}</div>
+                );})}
+              </div>}
+            </div>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)',flexShrink:0}}/>
             <span style={filtLabel}>Size</span>
             <div style={{display:'flex',alignItems:'center',gap:12}}>
               <span style={{fontFamily:PP,fontSize:11,color:'#CFCABF'}}>35</span>
-              <div style={{position:'relative',width:180,height:4,borderRadius:999,background:'rgba(255,255,255,.16)'}}>
-                <div style={{position:'absolute',left:0,top:0,bottom:0,width:'64%',borderRadius:999,background:'linear-gradient(90deg,'+T.cobalt+','+T.cyan+')'}}/>
-                <span style={{position:'absolute',left:'64%',top:'50%',transform:'translate(-50%,-50%)',width:16,height:16,borderRadius:999,background:'#0B0A0C',border:'2px solid '+T.cyan,boxShadow:'0 0 12px '+T.cyan}}/>
+              <div style={{position:'relative',width:180,height:20,display:'flex',alignItems:'center'}}>
+                <div style={{position:'absolute',left:0,right:0,height:4,borderRadius:999,background:'rgba(255,255,255,.16)'}}/>
+                <div style={{position:'absolute',left:0,height:4,borderRadius:999,width:((sizeFilter-35)/8*100)+'%',background:'linear-gradient(90deg,'+T.cobalt+','+T.cyan+')',transition:'width .1s'}}/>
+                <span style={{position:'absolute',left:((sizeFilter-35)/8*100)+'%',top:'50%',transform:'translate(-50%,-50%)',width:16,height:16,borderRadius:999,background:'#0B0A0C',border:'2px solid '+T.cyan,boxShadow:'0 0 12px '+T.cyan,pointerEvents:'none',zIndex:2,transition:'left .1s'}}/>
+                <input type="range" min="35" max="43" step="1" value={sizeFilter}
+                  onChange={function(e){setSizeFilter(parseInt(e.target.value,10));}}
+                  style={{position:'absolute',inset:0,opacity:0,cursor:'pointer',width:'100%',margin:0,zIndex:3}}/>
               </div>
-              <span style={{fontFamily:PP,fontSize:11,color:'#CFCABF'}}>43</span>
+              <span style={{fontFamily:PP,fontSize:11,fontWeight:600,color:T.cyan,minWidth:20}}>{sizeFilter}</span>
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:28,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
+
+          {/* Row 2: Type · Heels · Color */}
+          <div style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap',padding:'18px 24px',borderBottom:'1px solid rgba(0,229,255,.16)'}}>
             <span style={filtLabel}>Type</span>
             <div style={{display:'flex',gap:9,flexWrap:'wrap'}}>
-              {['Stiletto','Pump','Boot','Sandal','Platform','Slingback'].map(function(t,i){return <Chip key={t} active={i===0}>{t}</Chip>;})}
+              {['All','Stiletto','Pump','Boot','Sandal','Platform','Slingback'].map(function(t){var on=typeFilter===t;return(
+                <span key={t} onClick={function(){setTypeFilter(t);}} style={chipStyle(on)}>{t}</span>
+              );} )}
             </div>
-            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)'}}/>
-            <span style={filtLabel}>Heels</span><Toggle on="With" off="Without"/>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)',flexShrink:0}}/>
+            <span style={filtLabel}>Heels</span>
+            <span style={{display:'inline-flex',borderRadius:999,overflow:'hidden',border:'1px solid rgba(0,229,255,.4)',cursor:'pointer'}}>
+              {['With','Without'].map(function(h){var on=heelFilter===h;return(
+                <span key={h} onClick={function(){setHeelFilter(h);}} style={{padding:'8px 15px',fontFamily:PP,fontSize:11.5,letterSpacing:.5,fontWeight:600,color:on?'#080810':'#CFCABF',background:on?'linear-gradient(95deg,'+T.cobalt+','+T.cyan+')':'rgba(16,16,22,.4)',transition:'all .2s'}}>{h}</span>
+              );})}
+            </span>
+            <span style={{width:1,height:26,background:'rgba(0,229,255,.2)',flexShrink:0}}/>
             <span style={filtLabel}>Color</span>
-            <div style={{display:'flex',gap:9,alignItems:'center'}}>
-              {['#16161C','#C7A98A','#86202C','#C2A766',T.pink,T.cyan,T.cobalt,'#E9E4DA'].map(function(c,i){return(<span key={i} style={{width:18,height:18,borderRadius:999,background:c,border:i===4?'2px solid #fff':'1px solid rgba(255,255,255,.35)',boxShadow:i===4?'0 0 12px '+T.pink:'none'}}/>);})}
+            <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+              {COLOR_GROUPS.map(function(cg,i){var active=colorFilter===cg.col;return(
+                <span key={i} onClick={function(){setColorFilter(active?null:cg.col);}}
+                  style={{width:active?22:18,height:active?22:18,borderRadius:999,background:cg.col,border:active?'2.5px solid #fff':'1px solid rgba(255,255,255,.35)',boxShadow:active?'0 0 14px '+cg.col:'none',cursor:'pointer',transition:'all .15s',flexShrink:0}}/>
+              );})}
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',padding:'16px 24px'}}>
-            <div style={{display:'flex',alignItems:'center',gap:14}}>
+
+          {/* Row 3: Sort · Per page */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:20,flexWrap:'wrap',padding:'16px 24px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
               <span style={filtLabel}>Sort by</span>
-              <div style={{display:'flex',gap:9}}>
-                {['New Arrivals','Price Low','Price High','Name'].map(function(s,i){return <Chip key={s} active={i===0}>{s}</Chip>;})}
+              <div style={{display:'flex',gap:9,flexWrap:'wrap'}}>
+                {['New Arrivals','Price Low','Price High','Name'].map(function(s){var on=sortBy===s;return(
+                  <span key={s} onClick={function(){setSortBy(s);}} style={chipStyle(on)}>{s}</span>
+                );})}
               </div>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:12}}><span style={filtLabel}>Per page</span><Drop>12</Drop></div>
+            <div style={{display:'flex',alignItems:'center',gap:12}} onClick={function(e){e.stopPropagation();}}>
+              <span style={filtLabel}>Per page</span>
+              <div style={{position:'relative'}}>
+                <span onClick={function(){setDropPP(function(v){return !v;});setDropPL(false);}} style={{display:'inline-flex',alignItems:'center',gap:10,borderRadius:10,padding:'9px 14px',background:'rgba(16,16,22,.42)',border:'1px solid '+T.cyan+'88',fontFamily:PP,fontSize:12.5,color:'#F1ECE2',letterSpacing:.5,cursor:'pointer',userSelect:'none'}}>
+                  {perPage}<span style={{color:T.cyan,fontSize:10}}>▾</span>
+                </span>
+                {dropPP&&<div style={Object.assign({},dropStyle,{bottom:'calc(100% + 6px)',right:0,minWidth:80})}>
+                  {[6,12,24,48].map(function(n){return(
+                    <div key={n} onClick={function(){setPerPage(n);setDropPP(false);}} style={Object.assign({},dropItem(perPage===n),{textAlign:'center'})}
+                      onMouseEnter={function(e){e.currentTarget.style.background='rgba(0,229,255,.14)';}}
+                      onMouseLeave={function(e){e.currentTarget.style.background=perPage===n?'rgba(0,229,255,.10)':'transparent';}}
+                    >{n}</div>
+                  );})}
+                </div>}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Results bar */}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
           <span style={{fontFamily:PP,fontSize:12.5,fontWeight:300,letterSpacing:1,color:'#CFCABF'}}>
-            Showing <span style={{color:'#F6F2EA',fontWeight:600}}>{page*12+1}–{page*12+items.length}</span> of {TOTAL} · <span style={{color:T.cyan}}>{page===SIG?'the signature edit':'new arrivals'}</span>
+            {TOTAL===0
+              ?<span>No styles match your filters</span>
+              :<span>Showing <span style={{color:'#F6F2EA',fontWeight:600}}>{safePg*perPage+1}–{Math.min((safePg+1)*perPage,TOTAL)}</span> of {TOTAL} · <span style={{color:T.cyan}}>{typeFilter!=='All'?typeFilter+' edit':productLine!=='All'?productLine:sortBy==='New Arrivals'?'new arrivals':'sorted by '+sortBy.toLowerCase()}</span></span>
+            }
           </span>
-          <span style={{fontFamily:PP,fontSize:12,letterSpacing:1,color:T.pink,borderBottom:'1px solid '+T.pink+'66',paddingBottom:3,cursor:'pointer'}}>Clear filters ✕</span>
+          <span onClick={clearFilters} style={{fontFamily:PP,fontSize:12,letterSpacing:1,color:T.pink,borderBottom:'1px solid '+T.pink+'66',paddingBottom:3,cursor:'pointer'}}>Clear filters ✕</span>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:22}}>
+
+        {/* Grid */}
+        {TOTAL===0
+          ?<div style={{textAlign:'center',padding:'80px 0',fontFamily:PP}}>
+            <div style={{fontSize:18,color:'#8C887F',marginBottom:16}}>No styles match your filters</div>
+            <span onClick={clearFilters} style={{fontSize:13,color:T.cyan,cursor:'pointer',borderBottom:'1px solid '+T.cyan+'44'}}>Clear all filters</span>
+          </div>
+          :<div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:22}}>
           {items.map(function(item,i){
-            var file=item[0],name=item[1],desc=item[2],tone=item[3],price=item[4];
+            var file=item[0],name=item[1],desc=item[2],tone=item[3],price=item[4],isNew=file[0]==='n';
             return(
               <div key={file} onClick={function(e){var secEl=e.currentTarget.closest('section');var y=0,el=e.currentTarget;while(el&&el!==secEl){y+=el.offsetTop||0;el=el.offsetParent;}setSel({file:file,name:name,desc:desc,tone:tone,price:price,col:NEON[i%3],y:y,secH:secEl?secEl.offsetHeight:0});}}
                 style={{borderRadius:16,overflow:'hidden',cursor:'pointer',border:'1px solid '+NEON[i%3]+'55',background:'rgba(12,12,17,.40)',backdropFilter:'blur(6px)',boxShadow:'0 0 16px '+NEON[i%3]+'22',transition:'transform .25s,box-shadow .25s,border-color .25s'}}
@@ -414,7 +606,7 @@ function Catalog(props){
                 <div style={{position:'relative',height:360,overflow:'hidden',background:'#0A090C'}}>
                   <img src={IMG+file+'.jpg'} alt={name+' — '+desc} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
                   <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'linear-gradient(180deg,rgba(8,7,10,.10) 0%,transparent 30%,transparent 72%,rgba(8,7,10,.55) 100%)'}}/>
-                  {i===0&&<span style={{position:'absolute',top:14,left:14,fontFamily:PP,fontSize:9,fontWeight:600,letterSpacing:2,color:'#080810',background:page===SIG?T.cyan:T.pink,padding:'4px 9px',borderRadius:6,zIndex:2}}>{page===SIG?'SIGNATURE':'NEW DROP'}</span>}
+                  {i===0&&<span style={{position:'absolute',top:14,left:14,fontFamily:PP,fontSize:9,fontWeight:600,letterSpacing:2,color:'#080810',background:isNew?T.pink:T.cyan,padding:'4px 9px',borderRadius:6,zIndex:2}}>{isNew?'NEW DROP':'SIGNATURE'}</span>}
                   <span style={{position:'absolute',top:12,right:12,fontFamily:PP,fontSize:9,fontWeight:500,color:'#F6F2EA',background:'rgba(8,8,11,.6)',backdropFilter:'blur(6px)',border:'1px solid '+NEON[i%3]+'88',padding:'5px 9px',borderRadius:999,zIndex:2}}>Quick view +</span>
                   <span style={{position:'absolute',bottom:12,left:14,fontFamily:PP,fontSize:9.5,fontWeight:600,letterSpacing:1.5,textTransform:'uppercase',color:NEON[i%3],zIndex:2}}>{tone}</span>
                 </div>
@@ -431,27 +623,44 @@ function Catalog(props){
               </div>
             );
           })}
-        </div>
-        <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:10,marginTop:50}}>
+        </div>}
+
+        {/* Pagination */}
+        {TOTAL>0&&totalPages>1&&<div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:10,marginTop:50}}>
           {(function(){
-            function btn(label,target,disabled,active){return(<button key={label+'-'+target} disabled={disabled} onClick={function(){if(!disabled)setPage(target);}} style={{minWidth:38,height:38,display:'inline-flex',alignItems:'center',justifyContent:'center',borderRadius:10,fontFamily:PP,fontSize:13,fontWeight:active?600:400,cursor:disabled?'default':'pointer',opacity:disabled?0.35:1,color:active?'#080810':'#E7E2D8',background:active?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')'  :'rgba(16,16,22,.4)',border:active?'1px solid transparent':'1px solid rgba(0,229,255,.34)',backdropFilter:'blur(8px)',boxShadow:active?'0 0 16px '+T.cobalt+'55':'none',transition:'box-shadow .2s,border-color .2s'}} onMouseEnter={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor=T.cyan;e.currentTarget.style.boxShadow='0 0 14px '+T.cyan+'66';}}} onMouseLeave={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor='rgba(0,229,255,.34)';e.currentTarget.style.boxShadow='none';}}}>{label}</button>);}
-            var btns=[btn('‹',Math.max(0,page-1),page===0,false)];
-            PAGES.forEach(function(_,idx){btns.push(btn(String(idx+1),idx,false,idx===page));});
-            btns.push(btn('›',Math.min(PAGES.length-1,page+1),page===PAGES.length-1,false));
+            function btn(label,target,disabled,active){return(<button key={label+'_'+target} disabled={disabled} onClick={function(){if(!disabled)setPage(target);}}
+              style={{minWidth:38,height:38,display:'inline-flex',alignItems:'center',justifyContent:'center',borderRadius:10,fontFamily:PP,fontSize:13,fontWeight:active?600:400,cursor:disabled?'default':'pointer',opacity:disabled?0.35:1,color:active?'#080810':'#E7E2D8',background:active?'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 60%,'+T.cyan+')':'rgba(16,16,22,.4)',border:active?'1px solid transparent':'1px solid rgba(0,229,255,.34)',backdropFilter:'blur(8px)',boxShadow:active?'0 0 16px '+T.cobalt+'55':'none',transition:'box-shadow .2s,border-color .2s'}}
+              onMouseEnter={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor=T.cyan;e.currentTarget.style.boxShadow='0 0 14px '+T.cyan+'66';}}}
+              onMouseLeave={function(e){if(!active&&!disabled){e.currentTarget.style.borderColor='rgba(0,229,255,.34)';e.currentTarget.style.boxShadow='none';}}}>
+              {label}</button>);}
+            var btns=[btn('‹',Math.max(0,safePg-1),safePg===0,false)];
+            for(var idx=0;idx<totalPages;idx++){btns.push(btn(String(idx+1),idx,false,idx===safePg));}
+            btns.push(btn('›',Math.min(totalPages-1,safePg+1),safePg===totalPages-1,false));
             return btns;
           })()}
-        </div>
+        </div>}
       </div>
       {sel&&<ProductModal sel={sel} onClose={function(){setSel(null);}} sizes={sizesFor(sel.name)} soldOut={soldOut} WA={WA} PP={PP}/>}
     </section>
   );
 }
-
 function HeroMarbleNeon(){
   var PP="'Poppins',sans-serif";
   var nav=['NEW IN','HEELS','BOOTS','THE COSPLAY EDIT','STORES'];
   var neonLine='linear-gradient(90deg,'+T.pink+','+T.cobalt+','+T.cyan+')';
   var footerSec=React.useRef(null),footerC1=React.useRef(null),footerC2=React.useRef(null),footerAlive=React.useRef(true);
+  var toastRef=React.useRef(null);
+  var toastS=React.useState('');var toast=toastS[0];var setToast=toastS[1];
+  function showToast(msg){setToast(msg);if(toastRef.current)clearTimeout(toastRef.current);toastRef.current=setTimeout(function(){setToast('');},2200);}
+  function scrollToId(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+  function navClick(item){
+    if(item==='STORES'){scrollToId('stores');return;}
+    if(item==='BOOTS'){if(window._marisaSetFilter)window._marisaSetFilter({type:'Boot',heels:'With'});}
+    else if(item==='HEELS'){if(window._marisaSetFilter)window._marisaSetFilter({type:'Stiletto',heels:'With'});}
+    else if(item==='THE COSPLAY EDIT'){if(window._marisaSetFilter)window._marisaSetFilter({type:'Platform',heels:'With'});}
+    else{if(window._marisaSetFilter)window._marisaSetFilter({type:'All',sort:'New Arrivals'});}
+    setTimeout(function(){scrollToId('catalog');},60);
+  }
   React.useEffect(function(){
     var c1=footerC1.current,c2=footerC2.current,sec=footerSec.current;
     if(!c1||!c2||!sec)return;
@@ -475,6 +684,7 @@ function HeroMarbleNeon(){
 
   return(
     <div className="msd-page" style={{fontFamily:FB,background:'#F3EFE6',color:T.ink}}>
+      {toast&&<div style={{position:'fixed',top:24,right:24,zIndex:10000,padding:'14px 24px',borderRadius:12,background:'rgba(10,10,16,.96)',border:'1.5px solid '+T.cyan,backdropFilter:'blur(16px)',fontFamily:PP,fontSize:13,fontWeight:500,color:T.cyan,boxShadow:'0 0 24px '+T.cyan+'44,0 0 60px rgba(0,0,0,.4)',animation:'msdFlick .3s',letterSpacing:.5}}>{toast}</div>}
 
       {/* HERO */}
       <div className="msd-hero" style={{position:'relative',overflow:'hidden',background:T.void}}>
@@ -482,12 +692,15 @@ function HeroMarbleNeon(){
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,7,16,.34) 0%,transparent 22%,transparent 55%,rgba(5,7,16,.55) 100%)'}}/>
         <header className="msd-header" style={{position:'absolute',top:0,left:0,right:0,display:'flex',alignItems:'center',justifyContent:'space-between',background:'linear-gradient(180deg,rgba(10,13,26,.30),rgba(10,13,26,.06))',backdropFilter:'blur(13px) saturate(150%)',WebkitBackdropFilter:'blur(13px) saturate(150%)',borderBottom:'1px solid transparent',borderImage:neonLine+' 1',boxShadow:'inset 0 -1px 16px rgba(0,229,255,.10)'}}>
           <nav className="msd-nav msd-hero-nav" style={{display:'flex',gap:28}}>
-            {nav.map(function(n){return(<span key={n} style={{fontFamily:FB,fontSize:11,fontWeight:300,letterSpacing:2.5,textTransform:'uppercase',color:n==='THE COSPLAY EDIT'?T.pink:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)',cursor:'pointer'}}>{n}</span>);})}
+            {nav.map(function(n){return(<span key={n} onClick={function(){navClick(n);}} style={{fontFamily:FB,fontSize:11,fontWeight:300,letterSpacing:2.5,textTransform:'uppercase',color:n==='THE COSPLAY EDIT'?T.pink:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)',cursor:'pointer',transition:'color .2s,text-shadow .2s'}}
+              onMouseEnter={function(e){e.currentTarget.style.color=T.cyan;e.currentTarget.style.textShadow='0 0 10px '+T.cyan+'99';}}
+              onMouseLeave={function(e){e.currentTarget.style.color=n==='THE COSPLAY EDIT'?T.pink:'#EAF1FF';e.currentTarget.style.textShadow='0 1px 8px rgba(0,0,0,.45)';}}>{n}</span>);})}
           </nav>
           <NeonWord size={19}/>
           <div className="msd-header-links msd-hero-links" style={{display:'flex',gap:22,alignItems:'center',fontFamily:FB,fontSize:11,letterSpacing:2,color:'#EAF1FF',textShadow:'0 1px 8px rgba(0,0,0,.45)'}}>
-            <span style={{cursor:'pointer'}}>SEARCH</span><span style={{cursor:'pointer'}}>ACCOUNT</span>
-            <span style={{color:T.cyan,textShadow:'0 0 10px '+T.cyan+'99',cursor:'pointer'}}>BAG ⟨0⟩</span>
+            <span onClick={function(){showToast('🔍 Search is coming soon to Marisa Shoes');}} style={{cursor:'pointer'}}>SEARCH</span>
+            <span onClick={function(){showToast('👤 Sign in / create an account — coming soon');}} style={{cursor:'pointer'}}>ACCOUNT</span>
+            <span onClick={function(){showToast('🛍️ Your bag is empty — add a pair from The Collection');}} style={{color:T.cyan,textShadow:'0 0 10px '+T.cyan+'99',cursor:'pointer'}}>BAG ⟨0⟩</span>
           </div>
         </header>
         <div className="msd-hero-copy" style={{position:'absolute',left:50,bottom:84,maxWidth:1000}}>
@@ -496,7 +709,7 @@ function HeroMarbleNeon(){
             feel electric, feel the power
           </h1>
         </div>
-        <div style={{position:'absolute',left:0,right:0,bottom:30,display:'flex',flexDirection:'column',alignItems:'center',gap:9}}>
+        <div onClick={function(){scrollToId('about');}} style={{position:'absolute',left:0,right:0,bottom:30,display:'flex',flexDirection:'column',alignItems:'center',gap:9,cursor:'pointer'}}>
           <span style={{fontFamily:FB,fontSize:9,letterSpacing:4,textTransform:'uppercase',color:'#CDE6FF',textShadow:'0 1px 6px rgba(0,0,0,.5)'}}>Scroll</span>
           <svg width="26" height="16" viewBox="0 0 26 16" fill="none" style={{animation:'msdBounce 1.8s ease-in-out infinite',filter:'drop-shadow(0 0 7px '+T.cyan+') drop-shadow(0 0 10px '+T.pink+'88)'}}>
             <path d="M2 2 L13 13 L24 2" stroke={T.cyan} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -505,7 +718,7 @@ function HeroMarbleNeon(){
       </div>
 
       {/* ABOUT */}
-      <section className="msd-section-pad" style={{padding:'96px 70px 104px',position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
+      <section id="about" className="msd-section-pad" style={{padding:'96px 70px 104px',position:'relative',overflow:'hidden',background:'#0B0A0C'}}>
         <div style={{position:'absolute',inset:0,background:'url('+IMG+'marble_grey.jpg) center/cover'}}/>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.34),rgba(8,7,10,.22))'}}/>
         <div className="msd-about-grid" style={{position:'relative',display:'grid',gridTemplateColumns:'1fr 1.05fr',gap:64,alignItems:'center'}}>
@@ -527,7 +740,7 @@ function HeroMarbleNeon(){
               );})}
             </div>
             <div style={{marginTop:40}}>
-              <span style={{display:'inline-flex',alignItems:'center',gap:10,cursor:'pointer',fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:3,textTransform:'uppercase',color:'#080810',padding:'16px 38px',borderRadius:999,background:'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 52%,'+T.cyan+')',boxShadow:'0 0 24px '+T.cobalt+'66,0 0 14px '+T.pink+'55,inset 0 0 0 1px rgba(255,255,255,.25)'}}>BOOK A FITTING</span>
+              <a href="https://wa.me/255791696849?text=Hello%20Marisa%20Shoes%2C%20I'd%20like%20to%20book%20a%20fitting." target="_blank" rel="noreferrer" style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:10,cursor:'pointer',fontFamily:PP,fontSize:13,fontWeight:600,letterSpacing:3,textTransform:'uppercase',color:'#080810',padding:'16px 38px',borderRadius:999,background:'linear-gradient(95deg,'+T.pink+','+T.cobalt+' 52%,'+T.cyan+')',boxShadow:'0 0 24px '+T.cobalt+'66,0 0 14px '+T.pink+'55,inset 0 0 0 1px rgba(255,255,255,.25)'}}>BOOK A FITTING</a>
             </div>
           </div>
           <figure style={{margin:0,position:'relative'}}>
@@ -541,6 +754,7 @@ function HeroMarbleNeon(){
       </section>
 
       {/* SECTION 03 · TOUR — sticky scroll-driven canvas scrubber */}
+      <div id="tour" style={{position:'relative'}}/>
       <CanvasScrubber frames={tourImgs} wrapperHeight="350vh" sectionHeight="100vh" gradient="radial-gradient(120% 90% at 50% 50%,rgba(5,7,16,.18),rgba(5,7,16,.55))">
         <div style={{position:'absolute',inset:0,display:'flex',alignItems:'flex-end',justifyContent:'flex-start',padding:'0 0 64px 50px'}}>
           <TypeTour/>
@@ -553,7 +767,7 @@ function HeroMarbleNeon(){
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(8,7,10,.46),rgba(8,7,10,.46))'}}/>
         <div style={{position:'relative'}}>
           <Catalog seamless={true}/>
-          <section style={{position:'relative',overflow:'hidden',padding:'34px 70px 110px'}}>
+          <section id="testimonials" style={{position:'relative',overflow:'hidden',padding:'34px 70px 110px'}}>
             <div style={{position:'relative'}}>
               <div style={{textAlign:'center',marginBottom:54}}>
                 <div style={{display:'inline-flex',alignItems:'center',gap:12,marginBottom:16}}>
@@ -578,7 +792,7 @@ function HeroMarbleNeon(){
       </div>
 
       {/* FOOTER — scroll-driven canvas */}
-      <section ref={footerSec} style={{position:'relative',minHeight:760,overflow:'hidden',background:T.void}}>
+      <section id="stores" ref={footerSec} style={{position:'relative',minHeight:760,overflow:'hidden',background:T.void}}>
         <canvas ref={footerC1} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
         <canvas ref={footerC2} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)'}}/>
