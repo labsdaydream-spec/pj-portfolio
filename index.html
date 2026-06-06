@@ -441,6 +441,27 @@ function HeroMarbleNeon(){
   var PP="'Poppins',sans-serif";
   var nav=['NEW IN','HEELS','BOOTS','THE COSPLAY EDIT','STORES'];
   var neonLine='linear-gradient(90deg,'+T.pink+','+T.cobalt+','+T.cyan+')';
+  var footerSec=React.useRef(null),footerC1=React.useRef(null),footerC2=React.useRef(null),footerAlive=React.useRef(true);
+  React.useEffect(function(){
+    var c1=footerC1.current,c2=footerC2.current,sec=footerSec.current;
+    if(!c1||!c2||!sec)return;
+    var ctx1=c1.getContext('2d',{alpha:false}),ctx2=c2.getContext('2d');
+    footerAlive.current=true;
+    var frames=footerImgs,cf=0,tf=0;
+    function getProgress(){var rect=sec.getBoundingClientRect(),wH=window.innerHeight;return Math.max(0,Math.min(1,(wH-rect.top)/(wH+rect.height*0.55)));}
+    function raf(){
+      if(!footerAlive.current)return;
+      var p=getProgress();tf=p*(frames.length-1);cf+=(tf-cf)*0.18;
+      var fA=Math.max(0,Math.min(frames.length-1,Math.floor(cf))),fB=Math.min(frames.length-1,fA+1),mix=cf-Math.floor(cf);
+      if(frames[fA]&&frames[fA].complete&&frames[fA].naturalWidth){ctx1.drawImage(frames[fA],0,0,c1.width,c1.height);}
+      ctx2.clearRect(0,0,c2.width,c2.height);
+      if(frames[fB]&&frames[fB].complete&&frames[fB].naturalWidth&&mix>0.01){ctx2.globalAlpha=mix;ctx2.drawImage(frames[fB],0,0,c2.width,c2.height);ctx2.globalAlpha=1;}
+      var sc=(1+p*0.09).toFixed(4);c1.style.transform='scale('+sc+')';c2.style.transform='scale('+sc+')';
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return function(){footerAlive.current=false;};
+  },[]);
 
   return(
     <div className="msd-page" style={{fontFamily:FB,background:'#F3EFE6',color:T.ink}}>
@@ -510,7 +531,7 @@ function HeroMarbleNeon(){
       </section>
 
       {/* SECTION 03 · TOUR — sticky scroll-driven canvas scrubber */}
-      <CanvasScrubber frames={tourImgs} wrapperHeight="350vh" sectionHeight="720px" gradient="radial-gradient(120% 90% at 50% 50%,rgba(5,7,16,.18),rgba(5,7,16,.55))">
+      <CanvasScrubber frames={tourImgs} wrapperHeight="350vh" sectionHeight="100vh" gradient="radial-gradient(120% 90% at 50% 50%,rgba(5,7,16,.18),rgba(5,7,16,.55))">
         <div style={{position:'absolute',inset:0,display:'flex',alignItems:'flex-end',justifyContent:'flex-start',padding:'0 0 64px 50px'}}>
           <TypeTour/>
         </div>
@@ -546,9 +567,12 @@ function HeroMarbleNeon(){
         </div>
       </div>
 
-      {/* FOOTER — sticky scroll-driven canvas scrubber */}
-      <CanvasScrubber frames={footerImgs} wrapperHeight="240vh" sectionHeight="clamp(480px,80vh,760px)" gradient="linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)">
-        <div className="msd-footer-pad" style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'70px 70px 44px'}}>
+      {/* FOOTER — scroll-driven canvas */}
+      <section ref={footerSec} style={{position:'relative',minHeight:760,overflow:'hidden',background:T.void}}>
+        <canvas ref={footerC1} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        <canvas ref={footerC2} width={1280} height={720} style={{position:'absolute',inset:0,width:'100%',height:'100%',display:'block',transformOrigin:'center center'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(5,6,12,.55) 0%,rgba(5,6,12,.42) 45%,rgba(5,6,12,.82) 100%)'}}/>
+        <div className="msd-footer-pad" style={{position:'relative',minHeight:760,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'70px 70px 44px'}}>
           <div style={{maxWidth:720}}>
             <div style={{fontFamily:PP,fontSize:12,fontWeight:400,letterSpacing:5,textTransform:'uppercase',color:T.cyan,textShadow:'0 0 12px '+T.cyan+'88',marginBottom:20}}>The floor is open</div>
             <h2 className="msd-footer-h2" style={{margin:0,fontFamily:PP,fontWeight:600,fontSize:60,lineHeight:1.08,letterSpacing:-1,color:'#F6F2EA',textShadow:'0 2px 22px rgba(0,0,0,.55)'}}>Your pair is<br/>waiting under<br/>the chandelier.</h2>
@@ -582,7 +606,7 @@ function HeroMarbleNeon(){
             </div>
           </div>
         </div>
-      </CanvasScrubber>
+      </section>
     </div>
   );
 }
